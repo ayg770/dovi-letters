@@ -774,38 +774,63 @@
             'ת': ['ה', 'ח', 'ש']
         };
 
-        // Initial letters data
+        // Initial letters data - all Hebrew alphabet
         let letters = [
-            { letter: 'כ', name: 'כף', audio: null },
-            { letter: 'ך', name: 'כף סופית', audio: null },
-            { letter: 'ל', name: 'למד', audio: null },
-            { letter: 'מ', name: 'מם', audio: null },
-            { letter: 'ם', name: 'מם סופית', audio: null },
-            { letter: 'נ', name: 'נון', audio: null },
-            { letter: 'ן', name: 'נון סופית', audio: null },
-            { letter: 'ס', name: 'סמך', audio: null },
-            { letter: 'ע', name: 'עין', audio: null },
-            { letter: 'פ', name: 'פא', audio: null },
-            { letter: 'ף', name: 'פא סופית', audio: null }
+            { letter: 'א', name: 'אלף', audio: 'א.mp3' },
+            { letter: 'ב', name: 'בית', audio: 'ב.mp3' },
+            { letter: 'ג', name: 'גימל', audio: 'ג.mp3' },
+            { letter: 'ד', name: 'דלת', audio: 'ד.mp3' },
+            { letter: 'ה', name: 'הא', audio: 'ה.mp3' },
+            { letter: 'ו', name: 'וו', audio: 'ו.mp3' },
+            { letter: 'ז', name: 'זין', audio: 'ז.mp3' },
+            { letter: 'ח', name: 'חית', audio: 'ח.mp3' },
+            { letter: 'ט', name: 'טית', audio: 'ט.mp3' },
+            { letter: 'י', name: 'יוד', audio: 'י.mp3' },
+            { letter: 'כ', name: 'כף', audio: 'כ.mp3' },
+            { letter: 'ך', name: 'כף סופית', audio: 'ך.mp3' },
+            { letter: 'ל', name: 'למד', audio: 'ל.mp3' },
+            { letter: 'מ', name: 'מם', audio: 'מ.mp3' },
+            { letter: 'ם', name: 'מם סופית', audio: 'ם.mp3' },
+            { letter: 'נ', name: 'נון', audio: 'נ.mp3' },
+            { letter: 'ן', name: 'נון סופית', audio: 'ן.mp3' },
+            { letter: 'ס', name: 'סמך', audio: 'ס.mp3' },
+            { letter: 'ע', name: 'עין', audio: 'ע.mp3' },
+            { letter: 'פ', name: 'פא', audio: 'פ.mp3' },
+            { letter: 'ף', name: 'פא סופית', audio: 'ף.mp3' },
+            { letter: 'צ', name: 'צדי', audio: 'צ.mp3' },
+            { letter: 'ץ', name: 'צדי סופית', audio: 'ץ.mp3' },
+            { letter: 'ק', name: 'קוף', audio: 'ק.mp3' },
+            { letter: 'ר', name: 'ריש', audio: 'ר.mp3' },
+            { letter: 'ש', name: 'שין', audio: 'ש.mp3' },
+            { letter: 'ת', name: 'תו', audio: 'ת.mp3' }
         ];
 
         let score = 0;
         let currentLevel = 0;
         let currentQuestion = null;
-        let dobiImage = null;
+        let dobiImage = '176762376924.jpg'; // Default image from GitHub
 
         // Load saved data from localStorage
         function loadData() {
             const saved = localStorage.getItem('hebrewLettersData');
             if (saved) {
-                letters = JSON.parse(saved);
+                const savedLetters = JSON.parse(saved);
+                // Merge saved data with current letters (keep audio paths)
+                savedLetters.forEach(savedLetter => {
+                    const existing = letters.find(l => l.letter === savedLetter.letter);
+                    if (existing && savedLetter.audio && !savedLetter.audio.endsWith('.mp3')) {
+                        // This is base64 audio from localStorage - use it
+                        existing.audio = savedLetter.audio;
+                    }
+                });
             }
             
             const savedImage = localStorage.getItem('dobiImage');
             if (savedImage) {
                 dobiImage = savedImage;
-                updateImages();
             }
+            
+            updateImages();
         }
 
         function saveData() {
@@ -899,8 +924,22 @@
 
         function playLetterAudio(index) {
             if (!letters[index].audio) return;
-            const audio = new Audio(letters[index].audio);
-            audio.play();
+            
+            const audioSrc = letters[index].audio;
+            
+            // Check if it's a file path or base64
+            if (audioSrc.startsWith('data:')) {
+                // Base64 audio from localStorage
+                const audio = new Audio(audioSrc);
+                audio.play().catch(err => console.log('Error playing audio:', err));
+            } else {
+                // File path - load from GitHub repository
+                const audio = new Audio(audioSrc);
+                audio.play().catch(err => {
+                    console.log('Audio file not found:', audioSrc);
+                    console.log('Please upload', letters[index].name, 'audio file as', audioSrc);
+                });
+            }
         }
 
         function deleteLetter(index) {
@@ -1099,7 +1138,7 @@
             content.innerHTML = `
                 <div class="question-area">
                     <div class="question-text">האזן לצליל ובחר את האות הנכונה</div>
-                    <button class="submit-btn" onclick="playLetterAudio(${letters.indexOf(correct)})">🔊 נגן שוב</button>
+                    <button class="submit-btn" onclick="playQuestionAudio()">🔊 נגן שוב</button>
                 </div>
                 <div class="options-grid">
                     ${options.map(opt => `
@@ -1108,7 +1147,15 @@
                 </div>
             `;
             
-            setTimeout(() => playLetterAudio(letters.indexOf(correct)), 500);
+            // Store index for replay
+            window.currentAudioIndex = letters.indexOf(correct);
+            setTimeout(() => playQuestionAudio(), 500);
+        }
+        
+        function playQuestionAudio() {
+            if (window.currentAudioIndex !== undefined) {
+                playLetterAudio(window.currentAudioIndex);
+            }
         }
 
         // Level 3: Trace the letter with finger
