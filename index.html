@@ -1,0 +1,1653 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>דובי החסיד יודע אותיות</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            direction: rtl;
+            overflow-x: hidden;
+        }
+
+        /* Splash Screen */
+        .splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            animation: fadeOut 0.5s ease-out 3s forwards;
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                visibility: hidden;
+            }
+        }
+
+        .splash-image {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 8px solid white;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            margin-bottom: 30px;
+            animation: scaleIn 0.8s ease-out;
+            display: none;
+        }
+
+        .splash-image.visible {
+            display: block;
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .splash-title {
+            font-size: 3em;
+            color: white;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+            text-align: center;
+            padding: 0 20px;
+            animation: slideUp 1s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .splash-title .word {
+            display: inline-block;
+            margin: 0 10px;
+            animation: wordPop 0.5s ease-out backwards;
+        }
+
+        .splash-title .word:nth-child(1) { animation-delay: 0.3s; }
+        .splash-title .word:nth-child(2) { animation-delay: 0.6s; }
+        .splash-title .word:nth-child(3) { animation-delay: 0.9s; }
+        .splash-title .word:nth-child(4) { animation-delay: 1.2s; }
+
+        @keyframes wordPop {
+            from {
+                transform: scale(0) rotate(-10deg);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1) rotate(0);
+                opacity: 1;
+            }
+        }
+
+        /* Header */
+        .game-header-fixed {
+            position: sticky;
+            top: 0;
+            background: white;
+            padding: 10px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-height: 10vh;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #667eea;
+            display: none;
+        }
+
+        .header-image.visible {
+            display: block;
+        }
+
+        .header-title {
+            font-size: 1.2em;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .score {
+            font-size: 1.3em;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+
+        .main-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .admin-toggle {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .admin-toggle button {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .admin-toggle button:hover {
+            background: #ee5a52;
+        }
+
+        .admin-panel {
+            display: none;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .admin-panel.active {
+            display: block;
+        }
+
+        .admin-section {
+            margin-bottom: 25px;
+        }
+
+        .admin-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .image-upload-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .image-preview {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #667eea;
+            margin: 15px auto;
+            display: none;
+        }
+
+        .image-preview.visible {
+            display: block;
+        }
+
+        .upload-image-btn {
+            background: #51cf66;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            display: block;
+            margin: 10px auto;
+        }
+
+        .letter-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .letter-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .letter-item .letter-display {
+            font-size: 3em;
+            text-align: center;
+            margin-bottom: 10px;
+            color: #667eea;
+        }
+
+        .letter-item .letter-name {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .letter-item .audio-status {
+            text-align: center;
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .letter-item .audio-status.has-audio {
+            color: #51cf66;
+        }
+
+        .letter-item button {
+            width: 100%;
+            padding: 8px;
+            margin: 3px 0;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .upload-btn {
+            background: #51cf66;
+            color: white;
+        }
+
+        .upload-btn:hover {
+            background: #40c057;
+        }
+
+        .play-btn {
+            background: #339af0;
+            color: white;
+        }
+
+        .play-btn:hover {
+            background: #228be6;
+        }
+
+        .delete-btn {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background: #ee5a52;
+        }
+
+        .add-letter-form {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .add-letter-form input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 2px solid #e9ecef;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .add-letter-form button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .add-letter-form button:hover {
+            background: #5568d3;
+        }
+
+        .level-selection {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .level-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-align: center;
+        }
+
+        .level-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .level-card h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .level-card p {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .game-area {
+            display: none;
+            min-height: 400px;
+        }
+
+        .game-area.active {
+            display: block;
+        }
+
+        .back-btn {
+            background: #868e96;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .back-btn:hover {
+            background: #6c757d;
+        }
+
+        .question-area {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .letter-display-large {
+            font-size: 8em;
+            color: #667eea;
+            margin: 20px 0;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.2);
+        }
+
+        .question-text {
+            font-size: 1.5em;
+            color: #495057;
+            margin-bottom: 20px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 30px auto;
+            max-width: 600px;
+        }
+
+        .option-btn {
+            font-size: 4em;
+            padding: 30px;
+            background: white;
+            border: 3px solid #e9ecef;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #495057;
+            min-height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .option-btn.correct {
+            background: #51cf66;
+            color: white;
+            border-color: #51cf66;
+            animation: celebrate 0.5s;
+        }
+
+        .option-btn.wrong {
+            background: #ff6b6b;
+            color: white;
+            border-color: #ff6b6b;
+            animation: shake 0.5s;
+        }
+
+        .option-btn.wrong-permanent {
+            background: #ff6b6b;
+            color: white;
+            border-color: #ff6b6b;
+            opacity: 0.7;
+        }
+
+        @keyframes celebrate {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.1) rotate(-5deg); }
+            75% { transform: scale(1.1) rotate(5deg); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+            20%, 40%, 60%, 80% { transform: translateX(10px); }
+        }
+
+        .drag-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .letters-to-sort {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            min-height: 120px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border: 3px dashed transparent;
+        }
+
+        .sort-target {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            min-height: 140px;
+            padding: 25px;
+            background: #e9ecef;
+            border: 4px dashed #adb5bd;
+            border-radius: 15px;
+            transition: all 0.3s;
+        }
+
+        .sort-target.drag-over {
+            background: #d3f9d8;
+            border-color: #51cf66;
+            transform: scale(1.02);
+        }
+
+        .draggable-letter {
+            font-size: 3.5em;
+            padding: 25px 35px;
+            background: white;
+            border: 4px solid #667eea;
+            border-radius: 15px;
+            cursor: grab;
+            user-select: none;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            touch-action: none;
+        }
+
+        .draggable-letter:active {
+            cursor: grabbing;
+        }
+
+        .draggable-letter:hover {
+            transform: scale(1.1) rotate(2deg);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+
+        .draggable-letter.dragging {
+            opacity: 0.5;
+            transform: rotate(5deg);
+        }
+
+        .submit-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.2em;
+            display: block;
+            margin: 20px auto;
+            font-weight: bold;
+        }
+
+        .submit-btn:hover {
+            background: #5568d3;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 768px) {
+            .splash-title {
+                font-size: 2em;
+            }
+
+            .splash-image {
+                width: 200px;
+                height: 200px;
+            }
+
+            .header-title {
+                font-size: 1em;
+            }
+
+            .letter-display-large {
+                font-size: 5em;
+            }
+
+            .option-btn {
+                font-size: 2.5em;
+                padding: 20px;
+                min-height: 100px;
+            }
+
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .draggable-letter {
+                font-size: 2.5em;
+                padding: 15px 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Splash Screen -->
+    <div class="splash-screen" id="splashScreen">
+        <img src="" alt="דובי" class="splash-image" id="splashImage">
+        <div class="splash-title">
+            <span class="word">דוֹבִי</span>
+            <span class="word">הַחָסִיד</span>
+            <span class="word">יוֹדֵעַ</span>
+            <span class="word">אוֹתִיּוֹת</span>
+        </div>
+    </div>
+
+    <!-- Fixed Header -->
+    <div class="game-header-fixed" id="gameHeaderFixed">
+        <div class="header-left">
+            <img src="" alt="דובי" class="header-image" id="headerImage">
+            <div class="header-title">דוֹבִי הַחָסִיד יוֹדֵעַ אוֹתִיּוֹת</div>
+        </div>
+        <div class="header-right">
+            <div class="score">ניקוד: <span id="score">0</span></div>
+            <button class="back-btn hidden" id="backBtn" onclick="backToMenu()">חזרה</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="main-content">
+            <div class="admin-toggle">
+                <button onclick="toggleAdmin()">⚙️ ניהול מורה</button>
+            </div>
+
+            <div id="adminPanel" class="admin-panel">
+                <div class="admin-section image-upload-section">
+                    <h3>🖼️ תמונת דובי</h3>
+                    <img src="" alt="תצוגה מקדימה" class="image-preview" id="imagePreview">
+                    <input type="file" id="imageUpload" accept="image/*" style="display:none">
+                    <button class="upload-image-btn" onclick="triggerImageUpload()">
+                        📸 העלה תמונה של דובי
+                    </button>
+                </div>
+
+                <div class="admin-section">
+                    <h3>📚 אותיות במערכת</h3>
+                    <div id="lettersList" class="letter-list"></div>
+                </div>
+
+                <div class="admin-section">
+                    <h3>➕ הוספת אות חדשה</h3>
+                    <div class="add-letter-form">
+                        <input type="text" id="newLetter" placeholder="האות (למשל: א)" maxlength="1">
+                        <input type="text" id="newLetterName" placeholder="שם האות (למשל: אלף)">
+                        <button onclick="addNewLetter()">הוסף אות</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="levelSelection" class="level-selection">
+                <div class="level-card" onclick="startLevel(1)">
+                    <h3>🎯 רמה 1</h3>
+                    <p>מצא את האות הסופית</p>
+                </div>
+                <div class="level-card" onclick="startLevel(2)">
+                    <h3>🔊 רמה 2</h3>
+                    <p>מצא את האות לפי צליל</p>
+                </div>
+                <div class="level-card" onclick="startLevel(3)">
+                    <h3>✍️ רמה 3</h3>
+                    <p>עקוב עם האצבע על האות</p>
+                </div>
+                <div class="level-card" onclick="startLevel(4)">
+                    <h3>🔢 רמה 4</h3>
+                    <p>סדר את האותיות</p>
+                </div>
+                <div class="level-card" onclick="startLevel(5)">
+                    <h3>🧩 רמה 5</h3>
+                    <p>השלמת רצף</p>
+                </div>
+                <div class="level-card" onclick="startLevel(6)">
+                    <h3>👨‍👩‍👧 רמה 6</h3>
+                    <p>מיון רגילות וסופיות</p>
+                </div>
+            </div>
+
+            <div id="gameArea" class="game-area">
+                <div id="gameContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Audio context for sound effects
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSuccessSound() {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            oscillator.frequency.value = 523.25;
+            oscillator.type = 'sine';
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+            
+            setTimeout(() => {
+                const osc2 = audioContext.createOscillator();
+                const gain2 = audioContext.createGain();
+                osc2.connect(gain2);
+                gain2.connect(audioContext.destination);
+                osc2.frequency.value = 659.25;
+                osc2.type = 'sine';
+                gain2.gain.setValueAtTime(0.2, audioContext.currentTime);
+                gain2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                osc2.start(audioContext.currentTime);
+                osc2.stop(audioContext.currentTime + 0.3);
+            }, 100);
+        }
+
+        function playErrorSound() {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            oscillator.frequency.value = 200;
+            oscillator.type = 'sawtooth';
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.3);
+        }
+
+        // Similar letters mapping
+        const similarLetters = {
+            'א': ['ל', 'ה', 'ע'],
+            'ב': ['כ', 'ר', 'נ'],
+            'ג': ['נ', 'ך', 'ן'],
+            'ד': ['ר', 'ה', 'ח'],
+            'ה': ['ח', 'ת', 'ד'],
+            'ו': ['ז', 'ן', 'ף'],
+            'ז': ['ו', 'ן', 'ף'],
+            'ח': ['ה', 'ת', 'ד'],
+            'ט': ['ת', 'צ', 'ס'],
+            'י': ['ו', 'ז', 'ן'],
+            'כ': ['ב', 'ר', 'נ'],
+            'ך': ['ן', 'נ', 'ף'],
+            'ל': ['א', 'ע', 'צ'],
+            'מ': ['ס', 'ם', 'ע'],
+            'ם': ['ס', 'מ', 'ע'],
+            'נ': ['ב', 'כ', 'ג'],
+            'ן': ['ו', 'ז', 'ך'],
+            'ס': ['ם', 'מ', 'ע'],
+            'ע': ['ס', 'ם', 'צ'],
+            'פ': ['ף', 'כ', 'ב'],
+            'ף': ['ן', 'ו', 'ז'],
+            'צ': ['ץ', 'ע', 'ל'],
+            'ץ': ['ן', 'ף', 'צ'],
+            'ק': ['ר', 'ד', 'כ'],
+            'ר': ['ד', 'כ', 'ב'],
+            'ש': ['ת', 'ש', 'ם'],
+            'ת': ['ה', 'ח', 'ש']
+        };
+
+        // Initial letters data
+        let letters = [
+            { letter: 'כ', name: 'כף', audio: null },
+            { letter: 'ך', name: 'כף סופית', audio: null },
+            { letter: 'ל', name: 'למד', audio: null },
+            { letter: 'מ', name: 'מם', audio: null },
+            { letter: 'ם', name: 'מם סופית', audio: null },
+            { letter: 'נ', name: 'נון', audio: null },
+            { letter: 'ן', name: 'נון סופית', audio: null },
+            { letter: 'ס', name: 'סמך', audio: null },
+            { letter: 'ע', name: 'עין', audio: null },
+            { letter: 'פ', name: 'פא', audio: null },
+            { letter: 'ף', name: 'פא סופית', audio: null }
+        ];
+
+        let score = 0;
+        let currentLevel = 0;
+        let currentQuestion = null;
+        let dobiImage = null;
+
+        // Load saved data from localStorage
+        function loadData() {
+            const saved = localStorage.getItem('hebrewLettersData');
+            if (saved) {
+                letters = JSON.parse(saved);
+            }
+            
+            const savedImage = localStorage.getItem('dobiImage');
+            if (savedImage) {
+                dobiImage = savedImage;
+                updateImages();
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('hebrewLettersData', JSON.stringify(letters));
+        }
+
+        function updateImages() {
+            if (dobiImage) {
+                document.getElementById('splashImage').src = dobiImage;
+                document.getElementById('splashImage').classList.add('visible');
+                document.getElementById('headerImage').src = dobiImage;
+                document.getElementById('headerImage').classList.add('visible');
+                document.getElementById('imagePreview').src = dobiImage;
+                document.getElementById('imagePreview').classList.add('visible');
+            }
+        }
+
+        function triggerImageUpload() {
+            document.getElementById('imageUpload').click();
+        }
+
+        // Setup image upload
+        document.getElementById('imageUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                dobiImage = event.target.result;
+                localStorage.setItem('dobiImage', dobiImage);
+                updateImages();
+                alert('התמונה הועלתה בהצלחה!');
+            };
+            reader.readAsDataURL(file);
+        });
+
+        loadData();
+
+        function toggleAdmin() {
+            const panel = document.getElementById('adminPanel');
+            const levelSelection = document.getElementById('levelSelection');
+            panel.classList.toggle('active');
+            
+            if (panel.classList.contains('active')) {
+                renderLettersList();
+                levelSelection.style.display = 'none';
+            } else {
+                levelSelection.style.display = 'grid';
+            }
+        }
+
+        function renderLettersList() {
+            const container = document.getElementById('lettersList');
+            container.innerHTML = letters.map((item, index) => `
+                <div class="letter-item">
+                    <div class="letter-display">${item.letter}</div>
+                    <div class="letter-name">${item.name}</div>
+                    <div class="audio-status ${item.audio ? 'has-audio' : ''}">
+                        ${item.audio ? '🔊 יש אודיו' : '🔇 אין אודיו'}
+                    </div>
+                    <input type="file" id="audio-${index}" accept="audio/*" style="display:none" data-index="${index}">
+                    <button class="upload-btn" onclick="document.getElementById('audio-${index}').click()">
+                        ${item.audio ? 'החלף אודיו' : 'העלה אודיו'}
+                    </button>
+                    ${item.audio ? `<button class="play-btn" onclick="playLetterAudio(${index})">▶️ נגן</button>` : ''}
+                    <button class="delete-btn" onclick="deleteLetter(${index})">🗑️ מחק</button>
+                </div>
+            `).join('');
+
+            // Add event listeners to all audio inputs
+            letters.forEach((_, index) => {
+                const input = document.getElementById(`audio-${index}`);
+                if (input && !input.hasAttribute('data-listener')) {
+                    input.setAttribute('data-listener', 'true');
+                    input.addEventListener('change', function(e) {
+                        const file = e.target.files[0];
+                        if (!file) return;
+                        
+                        const reader = new FileReader();
+                        reader.onload = function(event) {
+                            letters[index].audio = event.target.result;
+                            saveData();
+                            renderLettersList();
+                            alert('האודיו הועלה בהצלחה!');
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                }
+            });
+        }
+
+        function playLetterAudio(index) {
+            if (!letters[index].audio) return;
+            const audio = new Audio(letters[index].audio);
+            audio.play();
+        }
+
+        function deleteLetter(index) {
+            if (confirm(`האם למחוק את האות "${letters[index].letter}"?`)) {
+                letters.splice(index, 1);
+                saveData();
+                renderLettersList();
+            }
+        }
+
+        function addNewLetter() {
+            const letterInput = document.getElementById('newLetter');
+            const nameInput = document.getElementById('newLetterName');
+            
+            const letter = letterInput.value.trim();
+            const name = nameInput.value.trim();
+
+            if (!letter || !name) {
+                alert('יש למלא את כל השדות');
+                return;
+            }
+
+            if (letters.find(l => l.letter === letter)) {
+                alert('האות כבר קיימת במערכת');
+                return;
+            }
+
+            letters.push({ letter, name, audio: null });
+            saveData();
+            renderLettersList();
+            
+            letterInput.value = '';
+            nameInput.value = '';
+            alert('האות נוספה בהצלחה!');
+        }
+
+        function startLevel(level) {
+            currentLevel = level;
+            score = 0;
+            document.getElementById('score').textContent = score;
+            document.getElementById('levelSelection').style.display = 'none';
+            document.getElementById('gameArea').classList.add('active');
+            document.getElementById('backBtn').classList.remove('hidden');
+            
+            nextQuestion();
+        }
+
+        function backToMenu() {
+            document.getElementById('gameArea').classList.remove('active');
+            document.getElementById('levelSelection').style.display = 'grid';
+            document.getElementById('backBtn').classList.add('hidden');
+            currentLevel = 0;
+        }
+
+        function nextQuestion() {
+            const content = document.getElementById('gameContent');
+            
+            switch(currentLevel) {
+                case 1:
+                    renderLevel1();
+                    break;
+                case 2:
+                    renderLevel2();
+                    break;
+                case 3:
+                    renderLevel3();
+                    break;
+                case 4:
+                    renderLevel4();
+                    break;
+                case 5:
+                    renderLevel5();
+                    break;
+                case 6:
+                    renderLevel6();
+                    break;
+            }
+        }
+
+        // Level 1: Regular letter → select final form
+        function renderLevel1() {
+            // Get letters that have final forms
+            const finalPairs = [
+                { regular: 'כ', final: 'ך' },
+                { regular: 'מ', final: 'ם' },
+                { regular: 'נ', final: 'ן' },
+                { regular: 'פ', final: 'ף' },
+                { regular: 'צ', final: 'ץ' }
+            ];
+            
+            // Filter to only pairs that exist in our letters
+            const availablePairs = finalPairs.filter(pair => 
+                letters.find(l => l.letter === pair.regular) && 
+                letters.find(l => l.letter === pair.final)
+            );
+            
+            if (availablePairs.length === 0) {
+                const content = document.getElementById('gameContent');
+                content.innerHTML = `
+                    <div class="question-area">
+                        <div class="question-text" style="color: #ff6b6b;">
+                            אין מספיק אותיות רגילות וסופיות במערכת
+                        </div>
+                        <button class="submit-btn" onclick="backToMenu()">חזרה לתפריט</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            const correctPair = availablePairs[Math.floor(Math.random() * availablePairs.length)];
+            const regularLetter = letters.find(l => l.letter === correctPair.regular);
+            const finalLetter = letters.find(l => l.letter === correctPair.final);
+            
+            currentQuestion = finalLetter;
+            
+            // Build options - include the correct final letter and other final letters
+            let options = [finalLetter];
+            
+            // Add other final letters
+            const otherFinals = letters.filter(l => 
+                l.name.includes('סופית') && 
+                l.letter !== finalLetter.letter
+            );
+            
+            while (options.length < Math.min(4, otherFinals.length + 1)) {
+                const random = otherFinals[Math.floor(Math.random() * otherFinals.length)];
+                if (!options.find(o => o.letter === random.letter)) {
+                    options.push(random);
+                }
+            }
+            
+            // If we don't have enough final letters, add regular ones
+            while (options.length < 4) {
+                const random = letters[Math.floor(Math.random() * letters.length)];
+                if (!options.find(o => o.letter === random.letter)) {
+                    options.push(random);
+                }
+            }
+            
+            options = shuffleArray(options);
+            
+            const content = document.getElementById('gameContent');
+            content.innerHTML = `
+                <div class="question-area">
+                    <div class="question-text">מה האות הסופית של:</div>
+                    <div class="letter-display-large">${regularLetter.letter}</div>
+                </div>
+                <div class="options-grid">
+                    ${options.map(opt => `
+                        <button class="option-btn" onclick="checkAnswer('${opt.letter}', '${finalLetter.letter}')">${opt.letter}</button>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // Level 2: Audio identification
+        function renderLevel2() {
+            const lettersWithAudio = letters.filter(l => l.audio);
+            
+            if (lettersWithAudio.length === 0) {
+                const content = document.getElementById('gameContent');
+                content.innerHTML = `
+                    <div class="question-area">
+                        <div class="question-text" style="color: #ff6b6b;">
+                            אין אותיות עם אודיו במערכת.<br>
+                            יש להעלות קבצי אודיו בלוח הניהול.
+                        </div>
+                        <button class="submit-btn" onclick="backToMenu()">חזרה לתפריט</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            const correct = lettersWithAudio[Math.floor(Math.random() * lettersWithAudio.length)];
+            currentQuestion = correct;
+            
+            let options = [correct];
+            const similar = similarLetters[correct.letter] || [];
+            
+            for (let similarLetter of similar) {
+                const found = letters.find(l => l.letter === similarLetter);
+                if (found && options.length < 4) {
+                    options.push(found);
+                }
+            }
+            
+            while (options.length < Math.min(4, letters.length)) {
+                const random = letters[Math.floor(Math.random() * letters.length)];
+                if (!options.find(o => o.letter === random.letter)) {
+                    options.push(random);
+                }
+            }
+            options = shuffleArray(options);
+            
+            const content = document.getElementById('gameContent');
+            content.innerHTML = `
+                <div class="question-area">
+                    <div class="question-text">האזן לצליל ובחר את האות הנכונה</div>
+                    <button class="submit-btn" onclick="playLetterAudio(${letters.indexOf(correct)})">🔊 נגן שוב</button>
+                </div>
+                <div class="options-grid">
+                    ${options.map(opt => `
+                        <button class="option-btn" onclick="checkAnswer('${opt.letter}', '${correct.letter}')">${opt.letter}</button>
+                    `).join('')}
+                </div>
+            `;
+            
+            setTimeout(() => playLetterAudio(letters.indexOf(correct)), 500);
+        }
+
+        // Level 3: Trace the letter with finger
+        function renderLevel3() {
+            const correct = letters[Math.floor(Math.random() * letters.length)];
+            currentQuestion = correct;
+            
+            const content = document.getElementById('gameContent');
+            content.innerHTML = `
+                <div class="question-area">
+                    <div class="question-text">עקוב עם האצבע על האות: ${correct.name}</div>
+                </div>
+                <div style="text-align: center; margin: 30px 0;">
+                    <canvas id="traceCanvas" width="600" height="600" style="border: 3px solid #667eea; border-radius: 15px; touch-action: none; max-width: 95%; background: white;"></canvas>
+                </div>
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="submit-btn" onclick="resetTracing()">נסה שוב</button>
+                </div>
+            `;
+            
+            setupLetterTracing(correct.letter);
+        }
+
+        function setupLetterTracing(letter) {
+            const canvas = document.getElementById('traceCanvas');
+            const ctx = canvas.getContext('2d');
+            let isDrawing = false;
+            let tracedPixels = new Set();
+            let totalRequiredPixels = 0;
+            
+            // Draw the letter outline
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.font = 'bold 450px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            // Draw letter in light gray as guide
+            ctx.fillStyle = '#e9ecef';
+            ctx.fillText(letter, canvas.width / 2, canvas.height / 2);
+            
+            // Draw dotted outline
+            ctx.strokeStyle = '#667eea';
+            ctx.lineWidth = 12;
+            ctx.setLineDash([20, 20]);
+            ctx.strokeText(letter, canvas.width / 2, canvas.height / 2);
+            ctx.setLineDash([]);
+            
+            // Calculate required pixels for the outline
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < imageData.data.length; i += 4) {
+                if (imageData.data[i + 3] > 0) {
+                    totalRequiredPixels++;
+                }
+            }
+            
+            function getMousePos(e) {
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                
+                if (e.touches) {
+                    return {
+                        x: (e.touches[0].clientX - rect.left) * scaleX,
+                        y: (e.touches[0].clientY - rect.top) * scaleY
+                    };
+                }
+                return {
+                    x: (e.clientX - rect.left) * scaleX,
+                    y: (e.clientY - rect.top) * scaleY
+                };
+            }
+            
+            function draw(e) {
+                if (!isDrawing) return;
+                e.preventDefault();
+                
+                const pos = getMousePos(e);
+                
+                // Draw user's path
+                ctx.strokeStyle = '#51cf66';
+                ctx.lineWidth = 25;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                
+                if (lastPos) {
+                    ctx.beginPath();
+                    ctx.moveTo(lastPos.x, lastPos.y);
+                    ctx.lineTo(pos.x, pos.y);
+                    ctx.stroke();
+                }
+                
+                lastPos = pos;
+                
+                // Track traced pixels
+                const radius = 15;
+                for (let dx = -radius; dx <= radius; dx++) {
+                    for (let dy = -radius; dy <= radius; dy++) {
+                        if (dx * dx + dy * dy <= radius * radius) {
+                            const px = Math.floor(pos.x + dx);
+                            const py = Math.floor(pos.y + dy);
+                            if (px >= 0 && px < canvas.width && py >= 0 && py < canvas.height) {
+                                tracedPixels.add(`${px},${py}`);
+                            }
+                        }
+                    }
+                }
+                
+                // Check if enough is traced (90% coverage)
+                if (tracedPixels.size > totalRequiredPixels * 0.9) {
+                    isDrawing = false;
+                    
+                    // Success animation
+                    ctx.strokeStyle = '#51cf66';
+                    ctx.lineWidth = 15;
+                    ctx.strokeText(letter, canvas.width / 2, canvas.height / 2);
+                    
+                    playSuccessSound();
+                    score += 10;
+                    document.getElementById('score').textContent = score;
+                    
+                    setTimeout(() => {
+                        nextQuestion();
+                    }, 1500);
+                }
+            }
+            
+            let lastPos = null;
+            
+            canvas.addEventListener('mousedown', (e) => {
+                isDrawing = true;
+                lastPos = getMousePos(e);
+            });
+            
+            canvas.addEventListener('mousemove', draw);
+            
+            canvas.addEventListener('mouseup', () => {
+                isDrawing = false;
+                lastPos = null;
+            });
+            
+            canvas.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                isDrawing = true;
+                lastPos = getMousePos(e);
+            }, { passive: false });
+            
+            canvas.addEventListener('touchmove', draw, { passive: false });
+            
+            canvas.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                isDrawing = false;
+                lastPos = null;
+            }, { passive: false });
+        }
+
+        function resetTracing() {
+            if (currentQuestion) {
+                setupLetterTracing(currentQuestion.letter);
+            }
+        }
+
+        // Level 4: Click to sort letters
+        function renderLevel4() {
+            const numLetters = Math.min(5, letters.length);
+            const selectedLetters = shuffleArray([...letters]).slice(0, numLetters);
+            const sortedLetters = [...selectedLetters].sort((a, b) => {
+                const hebrewOrder = 'אבגדהוזחטיכךלמםנןסעפףצץקרשת';
+                return hebrewOrder.indexOf(a.letter) - hebrewOrder.indexOf(b.letter);
+            });
+            
+            currentQuestion = sortedLetters;
+            
+            const content = document.getElementById('gameContent');
+            content.innerHTML = `
+                <div class="question-area">
+                    <div class="question-text">סדר את האותיות לפי סדר האלף-בית<br><small style="color: #868e96;">לחץ על אות כדי להעביר אותה</small></div>
+                </div>
+                <div class="drag-container">
+                    <div class="letters-to-sort" id="lettersPool" style="min-height: 150px;">
+                        ${shuffleArray([...selectedLetters]).map((l, i) => `
+                            <div class="draggable-letter" data-letter="${l.letter}" onclick="moveLetterDown(this)" style="cursor: pointer;">
+                                ${l.letter}
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="sort-target" id="sortTarget" style="min-height: 150px;">
+                        <div style="color: #adb5bd; text-align: center; width: 100%; font-size: 1.5em;" id="targetPlaceholder">לחץ על אות למעלה</div>
+                    </div>
+                </div>
+                <button class="submit-btn" onclick="checkSortOrder()">בדוק סדר</button>
+            `;
+        }
+
+        function moveLetterDown(element) {
+            const pool = document.getElementById('lettersPool');
+            const target = document.getElementById('sortTarget');
+            const placeholder = document.getElementById('targetPlaceholder');
+            
+            if (element.parentElement === pool) {
+                // Move from pool to target
+                if (placeholder) placeholder.remove();
+                target.appendChild(element);
+                element.onclick = function() { moveLetterUp(this); };
+            }
+        }
+
+        function moveLetterUp(element) {
+            const pool = document.getElementById('lettersPool');
+            const target = document.getElementById('sortTarget');
+            
+            if (element.parentElement === target) {
+                // Move from target to pool
+                pool.appendChild(element);
+                element.onclick = function() { moveLetterDown(this); };
+                
+                // Add placeholder back if target is empty
+                if (target.querySelectorAll('.draggable-letter').length === 0) {
+                    target.innerHTML = '<div style="color: #adb5bd; text-align: center; width: 100%; font-size: 1.5em;" id="targetPlaceholder">לחץ על אות למעלה</div>';
+                }
+            }
+        }
+
+        function checkSortOrder() {
+            const target = document.getElementById('sortTarget');
+            const sortedElements = Array.from(target.querySelectorAll('.draggable-letter'));
+            const userOrder = sortedElements.map(el => el.dataset.letter);
+            const correctOrder = currentQuestion.map(l => l.letter);
+            
+            if (JSON.stringify(userOrder) === JSON.stringify(correctOrder)) {
+                // Success! Show green feedback
+                target.style.background = '#d3f9d8';
+                target.style.borderColor = '#51cf66';
+                sortedElements.forEach(el => {
+                    el.style.background = '#51cf66';
+                    el.style.color = 'white';
+                    el.style.borderColor = '#51cf66';
+                });
+                
+                playSuccessSound();
+                score += 20;
+                document.getElementById('score').textContent = score;
+                
+                setTimeout(() => {
+                    nextQuestion();
+                }, 1500);
+            } else {
+                playErrorSound();
+                target.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    target.style.animation = '';
+                }, 500);
+            }
+        }
+
+        // Level 5: Complete sequence
+        function renderLevel5() {
+            const hebrewOrder = 'אבגדהוזחטיכלמנסעפצקרשת';
+            const availableLetters = letters.filter(l => hebrewOrder.includes(l.letter))
+                .sort((a, b) => hebrewOrder.indexOf(a.letter) - hebrewOrder.indexOf(b.letter));
+            
+            if (availableLetters.length < 3) {
+                const content = document.getElementById('gameContent');
+                content.innerHTML = `
+                    <div class="question-area">
+                        <div class="question-text" style="color: #ff6b6b;">
+                            אין מספיק אותיות במערכת לרמה זו
+                        </div>
+                        <button class="submit-btn" onclick="backToMenu()">חזרה לתפריט</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Get a random starting point that allows for 3 consecutive letters
+            let startIndex = Math.floor(Math.random() * (availableLetters.length - 2));
+            const sequence = [
+                availableLetters[startIndex],
+                availableLetters[startIndex + 1],
+                availableLetters[startIndex + 2]
+            ];
+            
+            const missingIndex = Math.floor(Math.random() * 3);
+            const correct = sequence[missingIndex];
+            currentQuestion = correct;
+            
+            const displaySequence = sequence.map((l, i) => i === missingIndex ? '___' : l.letter);
+            
+            let options = [correct];
+            while (options.length < 4) {
+                const random = letters[Math.floor(Math.random() * letters.length)];
+                if (!options.find(o => o.letter === random.letter)) {
+                    options.push(random);
+                }
+            }
+            options = shuffleArray(options);
+            
+            const content = document.getElementById('gameContent');
+            content.innerHTML = `
+                <div class="question-area">
+                    <div class="question-text">מה האות החסרה?</div>
+                    <div class="letter-display-large">${displaySequence.join(' ')}</div>
+                </div>
+                <div class="options-grid">
+                    ${options.map(opt => `
+                        <button class="option-btn" onclick="checkAnswer('${opt.letter}', '${correct.letter}')">${opt.letter}</button>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // Level 6: Click to sort regular and final letters with choice bubble
+        function renderLevel6() {
+            const finalLetters = letters.filter(l => l.name.includes('סופית'));
+            
+            if (finalLetters.length === 0) {
+                const content = document.getElementById('gameContent');
+                content.innerHTML = `
+                    <div class="question-area">
+                        <div class="question-text" style="color: #ff6b6b;">
+                            אין אותיות סופיות במערכת
+                        </div>
+                        <button class="submit-btn" onclick="backToMenu()">חזרה לתפריט</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            const regularLetters = letters.filter(l => !l.name.includes('סופית'));
+            const selectedFinal = shuffleArray(finalLetters).slice(0, 2);
+            const selectedRegular = shuffleArray(regularLetters).slice(0, 3);
+            const allLetters = shuffleArray([...selectedFinal, ...selectedRegular]);
+            
+            currentQuestion = { final: selectedFinal, regular: selectedRegular };
+            
+            const content = document.getElementById('gameContent');
+            content.innerHTML = `
+                <div class="question-area">
+                    <div class="question-text">מיין את האותיות<br><small style="color: #868e96;">לחץ על אות ובחר: רגילה או סופית</small></div>
+                </div>
+                <div class="drag-container">
+                    <div class="sort-target" id="regularTarget" style="background: #e7f5ff; border-color: #1971c2; min-height: 150px;">
+                        <div style="color: #1971c2; font-weight: bold; font-size: 1.3em;" id="regularPlaceholder">אותיות רגילות</div>
+                    </div>
+                    <div class="letters-to-sort" id="lettersPool" style="min-height: 150px; position: relative;">
+                        ${allLetters.map((l, i) => `
+                            <div class="draggable-letter" data-letter="${l.letter}" data-isfinal="${l.name.includes('סופית')}" onclick="showChoiceBubble(this, event)" style="cursor: pointer;">
+                                ${l.letter}
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="sort-target" id="finalTarget" style="background: #fff0f6; border-color: #c2255c; min-height: 150px;">
+                        <div style="color: #c2255c; font-weight: bold; font-size: 1.3em;" id="finalPlaceholder">אותיות סופיות</div>
+                    </div>
+                </div>
+                <button class="submit-btn" onclick="checkSorting()">בדוק מיון</button>
+                
+                <!-- Choice bubble -->
+                <div id="choiceBubble" style="display: none; position: fixed; background: white; border: 4px solid #667eea; border-radius: 20px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 1000;">
+                    <div style="font-size: 1.5em; font-weight: bold; color: #667eea; margin-bottom: 15px; text-align: center;">האות היא:</div>
+                    <div style="display: flex; gap: 15px;">
+                        <button onclick="chooseLetterType(false)" style="flex: 1; background: #1971c2; color: white; border: none; padding: 20px; border-radius: 15px; font-size: 1.3em; cursor: pointer; font-weight: bold;">
+                            ⬆️<br>רגילה
+                        </button>
+                        <button onclick="chooseLetterType(true)" style="flex: 1; background: #c2255c; color: white; border: none; padding: 20px; border-radius: 15px; font-size: 1.3em; cursor: pointer; font-weight: bold;">
+                            ⬇️<br>סופית
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        let currentSelectedLetter = null;
+
+        function showChoiceBubble(element, event) {
+            // Only show bubble if letter is still in pool
+            const pool = document.getElementById('lettersPool');
+            if (element.parentElement !== pool) {
+                returnLetterToPool(element);
+                return;
+            }
+            
+            event.stopPropagation();
+            currentSelectedLetter = element;
+            
+            const bubble = document.getElementById('choiceBubble');
+            const rect = element.getBoundingClientRect();
+            
+            bubble.style.display = 'block';
+            bubble.style.left = (rect.left + rect.width / 2 - 150) + 'px';
+            bubble.style.top = (rect.top - 180) + 'px';
+        }
+
+        function chooseLetterType(isFinal) {
+            const bubble = document.getElementById('choiceBubble');
+            bubble.style.display = 'none';
+            
+            if (!currentSelectedLetter) return;
+            
+            const regularTarget = document.getElementById('regularTarget');
+            const finalTarget = document.getElementById('finalTarget');
+            const regularPlaceholder = document.getElementById('regularPlaceholder');
+            const finalPlaceholder = document.getElementById('finalPlaceholder');
+            
+            const actuallyFinal = currentSelectedLetter.dataset.isfinal === 'true';
+            
+            if (isFinal === actuallyFinal) {
+                // Correct choice!
+                if (isFinal) {
+                    if (finalPlaceholder) finalPlaceholder.remove();
+                    finalTarget.appendChild(currentSelectedLetter);
+                } else {
+                    if (regularPlaceholder) regularPlaceholder.remove();
+                    regularTarget.appendChild(currentSelectedLetter);
+                }
+                currentSelectedLetter.onclick = function() { returnLetterToPool(this); };
+                currentSelectedLetter = null;
+            } else {
+                // Wrong choice! Shake and play error sound
+                playErrorSound();
+                currentSelectedLetter.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    currentSelectedLetter.style.animation = '';
+                }, 500);
+                currentSelectedLetter = null;
+            }
+        }
+
+        function returnLetterToPool(element) {
+            const pool = document.getElementById('lettersPool');
+            const regularTarget = document.getElementById('regularTarget');
+            const finalTarget = document.getElementById('finalTarget');
+            
+            // Return to pool
+            pool.appendChild(element);
+            element.onclick = function(e) { showChoiceBubble(this, e); };
+            
+            // Add placeholders back if targets are empty
+            if (regularTarget.querySelectorAll('.draggable-letter').length === 0 && !document.getElementById('regularPlaceholder')) {
+                regularTarget.innerHTML = '<div style="color: #1971c2; font-weight: bold; font-size: 1.3em;" id="regularPlaceholder">אותיות רגילות</div>';
+            }
+            
+            if (finalTarget.querySelectorAll('.draggable-letter').length === 0 && !document.getElementById('finalPlaceholder')) {
+                finalTarget.innerHTML = '<div style="color: #c2255c; font-weight: bold; font-size: 1.3em;" id="finalPlaceholder">אותיות סופיות</div>';
+            }
+        }
+
+        function checkSorting() {
+            const regularTarget = document.getElementById('regularTarget');
+            const finalTarget = document.getElementById('finalTarget');
+            
+            const regularElements = Array.from(regularTarget.querySelectorAll('.draggable-letter'));
+            const finalElements = Array.from(finalTarget.querySelectorAll('.draggable-letter'));
+            
+            const allCorrect = regularElements.every(el => el.dataset.isfinal === 'false') &&
+                              finalElements.every(el => el.dataset.isfinal === 'true');
+            
+            if (allCorrect && regularElements.length === currentQuestion.regular.length && 
+                finalElements.length === currentQuestion.final.length) {
+                // Success! Show green feedback
+                regularTarget.style.background = '#d3f9d8';
+                regularTarget.style.borderColor = '#51cf66';
+                finalTarget.style.background = '#d3f9d8';
+                finalTarget.style.borderColor = '#51cf66';
+                
+                [...regularElements, ...finalElements].forEach(el => {
+                    el.style.background = '#51cf66';
+                    el.style.color = 'white';
+                    el.style.borderColor = '#51cf66';
+                });
+                
+                playSuccessSound();
+                score += 20;
+                document.getElementById('score').textContent = score;
+                
+                setTimeout(() => {
+                    nextQuestion();
+                }, 1500);
+            } else {
+                playErrorSound();
+                [regularTarget, finalTarget].forEach(target => {
+                    target.style.animation = 'shake 0.5s';
+                    setTimeout(() => {
+                        target.style.animation = '';
+                    }, 500);
+                });
+            }
+        }
+
+        // Close bubble when clicking outside
+        document.addEventListener('click', (e) => {
+            const bubble = document.getElementById('choiceBubble');
+            if (bubble && !bubble.contains(e.target) && !e.target.classList.contains('draggable-letter')) {
+                bubble.style.display = 'none';
+                currentSelectedLetter = null;
+            }
+        });
+
+        function checkAnswer(userAnswer, correctAnswer) {
+            const clickedButton = event.target;
+            
+            if (userAnswer === correctAnswer) {
+                // Correct answer!
+                const buttons = document.querySelectorAll('.option-btn');
+                buttons.forEach(btn => btn.disabled = true);
+                
+                clickedButton.classList.add('correct');
+                playSuccessSound();
+                score += 10;
+                document.getElementById('score').textContent = score;
+                setTimeout(() => {
+                    nextQuestion();
+                }, 1500);
+            } else {
+                // Wrong answer!
+                clickedButton.classList.add('wrong');
+                clickedButton.disabled = true;
+                playErrorSound();
+                
+                setTimeout(() => {
+                    clickedButton.classList.remove('wrong');
+                    clickedButton.classList.add('wrong-permanent');
+                    // Button stays disabled and red, but others remain clickable
+                }, 600);
+            }
+        }
+
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        // Hide splash screen after 3 seconds
+        setTimeout(() => {
+            document.getElementById('splashScreen').style.display = 'none';
+        }, 3000);
+    </script>
+</body>
+</html>
