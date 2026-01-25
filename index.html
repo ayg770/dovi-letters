@@ -575,6 +575,128 @@
             display: none !important;
         }
 
+        /* Balloon and Shooter Games */
+        .game-canvas {
+            width: 100%;
+            max-width: 600px;
+            height: 500px;
+            background: linear-gradient(180deg, #87CEEB 0%, #E0F6FF 100%);
+            border-radius: 15px;
+            margin: 20px auto;
+            position: relative;
+            overflow: hidden;
+            touch-action: none;
+        }
+
+        .balloon {
+            position: absolute;
+            width: 80px;
+            height: 100px;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5em;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .balloon:hover {
+            transform: scale(1.1);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .shooter {
+            position: absolute;
+            bottom: 20px;
+            width: 60px;
+            height: 60px;
+            background: #667eea;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            transition: left 0.1s;
+            cursor: pointer;
+        }
+
+        .falling-letter {
+            position: absolute;
+            font-size: 3em;
+            font-weight: bold;
+            color: #495057;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: 3px solid #667eea;
+            animation: fall linear;
+        }
+
+        @keyframes fall {
+            to { top: 100%; }
+        }
+
+        .bullet {
+            position: absolute;
+            width: 8px;
+            height: 20px;
+            background: #ffd43b;
+            border-radius: 4px;
+            animation: shoot 0.5s linear;
+        }
+
+        @keyframes shoot {
+            to { top: -50px; }
+        }
+
+        .game-score-display {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .game-timer {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #ff6b6b;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .game-target {
+            position: absolute;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #667eea;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
         @media (max-width: 768px) {
             .splash-title {
                 font-size: 2em;
@@ -641,6 +763,17 @@
             </div>
 
             <div id="adminPanel" class="admin-panel">
+                <div class="admin-section" style="background: white; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                    <h3 style="color: #667eea; margin-bottom: 10px;">⚙️ ניהול אוטומטי</h3>
+                    <label style="font-size: 1.1em; cursor: pointer;">
+                        <input type="checkbox" id="autoManageCheckbox" onchange="toggleAutoManage(this.checked)" style="margin-left: 10px; transform: scale(1.3);">
+                        הסתר אותיות אוטומטית אחרי 10 הצלחות
+                    </label>
+                    <p style="margin-top: 10px; font-size: 0.9em; color: #666;">
+                        כאשר מופעל, אותיות שהילד הצליח בהן 10 פעמים לא יופיעו יותר במשחק
+                    </p>
+                </div>
+                
                 <div class="admin-section image-upload-section">
                     <h3>🖼️ תמונת דובי</h3>
                     <img src="" alt="תצוגה מקדימה" class="image-preview" id="imagePreview">
@@ -689,6 +822,14 @@
                 <div class="level-card" onclick="startLevel(6)">
                     <h3>👨‍👩‍👧 רמה 6</h3>
                     <p>מיון רגילות וסופיות</p>
+                </div>
+                <div class="level-card" onclick="startLevel(7)">
+                    <h3>🎈 רמה 7</h3>
+                    <p>בלונים מרחפים</p>
+                </div>
+                <div class="level-card" onclick="startLevel(8)">
+                    <h3>🚀 רמה 8</h3>
+                    <p>משחק יריות</p>
                 </div>
             </div>
 
@@ -776,39 +917,54 @@
 
         // Initial letters data - all Hebrew alphabet
         let letters = [
-            { letter: 'א', name: 'אלף', audio: 'א.mp3' },
-            { letter: 'ב', name: 'בית', audio: 'ב.mp3' },
-            { letter: 'ג', name: 'גימל', audio: 'ג.mp3' },
-            { letter: 'ד', name: 'דלת', audio: 'ד.mp3' },
-            { letter: 'ה', name: 'הא', audio: 'ה.mp3' },
-            { letter: 'ו', name: 'וו', audio: 'ו.mp3' },
-            { letter: 'ז', name: 'זין', audio: 'ז.mp3' },
-            { letter: 'ח', name: 'חית', audio: 'ח.mp3' },
-            { letter: 'ט', name: 'טית', audio: 'ט.mp3' },
-            { letter: 'י', name: 'יוד', audio: 'י.mp3' },
-            { letter: 'כ', name: 'כף', audio: 'כ.mp3' },
-            { letter: 'ך', name: 'כף סופית', audio: 'ך.mp3' },
-            { letter: 'ל', name: 'למד', audio: 'ל.mp3' },
-            { letter: 'מ', name: 'מם', audio: 'מ.mp3' },
-            { letter: 'ם', name: 'מם סופית', audio: 'ם.mp3' },
-            { letter: 'נ', name: 'נון', audio: 'נ.mp3' },
-            { letter: 'ן', name: 'נון סופית', audio: 'ן.mp3' },
-            { letter: 'ס', name: 'סמך', audio: 'ס.mp3' },
-            { letter: 'ע', name: 'עין', audio: 'ע.mp3' },
-            { letter: 'פ', name: 'פא', audio: 'פ.mp3' },
-            { letter: 'ף', name: 'פא סופית', audio: 'ף.mp3' },
-            { letter: 'צ', name: 'צדי', audio: 'צ.mp3' },
-            { letter: 'ץ', name: 'צדי סופית', audio: 'ץ.mp3' },
-            { letter: 'ק', name: 'קוף', audio: 'ק.mp3' },
-            { letter: 'ר', name: 'ריש', audio: 'ר.mp3' },
-            { letter: 'ש', name: 'שין', audio: 'ש.mp3' },
-            { letter: 'ת', name: 'תו', audio: 'ת.mp3' }
+            { letter: 'א', name: 'אלף', audio: './א.mp3' },
+            { letter: 'ב', name: 'בית', audio: './ב.mp3' },
+            { letter: 'ג', name: 'גימל', audio: './ג.mp3' },
+            { letter: 'ד', name: 'דלת', audio: './ד.mp3' },
+            { letter: 'ה', name: 'הא', audio: './ה.mp3' },
+            { letter: 'ו', name: 'וו', audio: './ו.mp3' },
+            { letter: 'ז', name: 'זין', audio: './ז.mp3' },
+            { letter: 'ח', name: 'חית', audio: './ח.mp3' },
+            { letter: 'ט', name: 'טית', audio: './ט.mp3' },
+            { letter: 'י', name: 'יוד', audio: './י.mp3' },
+            { letter: 'כ', name: 'כף', audio: './כ.mp3' },
+            { letter: 'ך', name: 'כף סופית', audio: './ך.mp3' },
+            { letter: 'ל', name: 'למד', audio: './ל.mp3' },
+            { letter: 'מ', name: 'מם', audio: './מ.mp3' },
+            { letter: 'ם', name: 'מם סופית', audio: './ם.mp3' },
+            { letter: 'נ', name: 'נון', audio: './נ.mp3' },
+            { letter: 'ן', name: 'נון סופית', audio: './ן.mp3' },
+            { letter: 'ס', name: 'סמך', audio: './ס.mp3' },
+            { letter: 'ע', name: 'עין', audio: './ע.mp3' },
+            { letter: 'פ', name: 'פא', audio: './פ.mp3' },
+            { letter: 'ף', name: 'פא סופית', audio: './ף.mp3' },
+            { letter: 'צ', name: 'צדי', audio: './צ.mp3' },
+            { letter: 'ץ', name: 'צדי סופית', audio: './ץ.mp3' },
+            { letter: 'ק', name: 'קוף', audio: './ק.mp3' },
+            { letter: 'ר', name: 'ריש', audio: './ר.mp3' },
+            { letter: 'ש', name: 'שין', audio: './ש.mp3' },
+            { letter: 'ת', name: 'תו', audio: './ת.mp3' }
         ];
+        
+        // Initialize stats for all letters
+        function initializeStats() {
+            letters.forEach(l => {
+                if (!letterStats[l.letter]) {
+                    letterStats[l.letter] = { 
+                        successes: 0, 
+                        failures: 0,
+                        active: true 
+                    };
+                }
+            });
+        }
 
         let score = 0;
         let currentLevel = 0;
         let currentQuestion = null;
-        let dobiImage = '176762376924.jpg'; // Default image from GitHub
+        let dobiImage = './176762376924.jpg'; // Image from GitHub repository
+        let autoManage = false; // Auto-management: hide letters after 10 successes
+        let letterStats = {}; // Track success/failure for each letter
 
         // Load saved data from localStorage
         function loadData() {
@@ -830,6 +986,17 @@
                 dobiImage = savedImage;
             }
             
+            const savedStats = localStorage.getItem('letterStats');
+            if (savedStats) {
+                letterStats = JSON.parse(savedStats);
+            }
+            
+            const savedAutoManage = localStorage.getItem('autoManage');
+            if (savedAutoManage !== null) {
+                autoManage = savedAutoManage === 'true';
+            }
+            
+            initializeStats();
             updateImages();
         }
 
@@ -877,49 +1044,95 @@
             if (panel.classList.contains('active')) {
                 renderLettersList();
                 levelSelection.style.display = 'none';
+                // Update auto-manage checkbox
+                document.getElementById('autoManageCheckbox').checked = autoManage;
             } else {
                 levelSelection.style.display = 'grid';
             }
         }
 
+        function toggleAutoManage(enabled) {
+            autoManage = enabled;
+            saveStats();
+            if (enabled) {
+                alert('ניהול אוטומטי הופעל! אותיות עם 10+ הצלחות לא יופיעו במשחק');
+            } else {
+                alert('ניהול אוטומטי כובה. כל האותיות יופיעו במשחק');
+            }
+        }
+
         function renderLettersList() {
             const container = document.getElementById('lettersList');
-            container.innerHTML = letters.map((item, index) => `
+            container.innerHTML = letters.map((item, index) => {
+                const stats = letterStats[item.letter] || { successes: 0, failures: 0, active: true };
+                const total = stats.successes + stats.failures;
+                const successRate = total > 0 ? Math.round((stats.successes / total) * 100) : 0;
+                
+                return `
                 <div class="letter-item">
                     <div class="letter-display">${item.letter}</div>
                     <div class="letter-name">${item.name}</div>
                     <div class="audio-status ${item.audio ? 'has-audio' : ''}">
                         ${item.audio ? '🔊 יש אודיו' : '🔇 אין אודיו'}
                     </div>
-                    <input type="file" id="audio-${index}" accept="audio/*" style="display:none" data-index="${index}">
-                    <button class="upload-btn" onclick="document.getElementById('audio-${index}').click()">
+                    <div style="font-size: 0.85em; margin: 5px 0; color: #666;">
+                        ✅ ${stats.successes} | ❌ ${stats.failures} | ${successRate}% הצלחה
+                    </div>
+                    <label class="upload-btn" style="display: block; text-align: center; cursor: pointer;">
                         ${item.audio ? 'החלף אודיו' : 'העלה אודיו'}
-                    </button>
+                        <input
+                            type="file"
+                            accept="audio/*"
+                            onchange="handleAudioUpload(${index}, this.files[0])"
+                            className="hidden"
+                            style="display: none;"
+                        />
+                    </label>
                     ${item.audio ? `<button class="play-btn" onclick="playLetterAudio(${index})">▶️ נגן</button>` : ''}
+                    ${item.audio && item.audio.startsWith('data:') ? `<button class="play-btn" style="background: #40c057;" onclick="downloadAudio(${index})">💾 הורד MP3</button>` : ''}
                     <button class="delete-btn" onclick="deleteLetter(${index})">🗑️ מחק</button>
+                    <label style="display: block; margin-top: 5px; font-size: 0.9em;">
+                        <input type="checkbox" ${stats.active ? 'checked' : ''} onchange="toggleLetterActive('${item.letter}', this.checked)">
+                        פעיל במשחק
+                    </label>
                 </div>
-            `).join('');
+            `}).join('');
+        }
 
-            // Add event listeners to all audio inputs
-            letters.forEach((_, index) => {
-                const input = document.getElementById(`audio-${index}`);
-                if (input && !input.hasAttribute('data-listener')) {
-                    input.setAttribute('data-listener', 'true');
-                    input.addEventListener('change', function(e) {
-                        const file = e.target.files[0];
-                        if (!file) return;
-                        
-                        const reader = new FileReader();
-                        reader.onload = function(event) {
-                            letters[index].audio = event.target.result;
-                            saveData();
-                            renderLettersList();
-                            alert('האודיו הועלה בהצלחה!');
-                        };
-                        reader.readAsDataURL(file);
-                    });
-                }
-            });
+        function handleAudioUpload(index, file) {
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                letters[index].audio = event.target.result;
+                saveData();
+                renderLettersList();
+                alert('האודיו הועלה בהצלחה!');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function downloadAudio(index) {
+            const letter = letters[index];
+            if (!letter.audio || !letter.audio.startsWith('data:')) {
+                alert('אין אודיו להורדה');
+                return;
+            }
+            
+            const link = document.createElement('a');
+            link.href = letter.audio;
+            link.download = `${letter.letter}.mp3`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function toggleLetterActive(letter, active) {
+            if (!letterStats[letter]) {
+                letterStats[letter] = { successes: 0, failures: 0, active: true };
+            }
+            letterStats[letter].active = active;
+            saveStats();
         }
 
         function playLetterAudio(index) {
@@ -1016,7 +1229,247 @@
                 case 6:
                     renderLevel6();
                     break;
+                case 7:
+                    renderLevel7();
+                    break;
+                case 8:
+                    renderLevel8();
+                    break;
             }
+        }
+
+        // Level 7: Balloon game
+        function renderLevel7() {
+            const activeLetters = getActiveLetters();
+            if (activeLetters.length < 3) {
+                showNotEnoughLetters();
+                return;
+            }
+            
+            const targetLetter = activeLetters[Math.floor(Math.random() * activeLetters.length)];
+            currentQuestion = targetLetter;
+            
+            const content = document.getElementById('gameContent');
+            content.innerHTML = `
+                <div class="game-canvas" id="balloonCanvas">
+                    <div class="game-timer" id="gameTimer">⏱️ 30</div>
+                    <div class="game-score-display" id="gameScore">🎯 0</div>
+                    <div class="game-target">תפוס את כל ה-${targetLetter.letter}!</div>
+                </div>
+            `;
+            
+            startBalloonGame(targetLetter);
+        }
+
+        function startBalloonGame(targetLetter) {
+            const canvas = document.getElementById('balloonCanvas');
+            let gameScore = 0;
+            let timeLeft = 30;
+            const balloons = [];
+            const colors = ['#ff6b6b', '#51cf66', '#339af0', '#ffd43b', '#ff6347', '#9c88ff'];
+            
+            // Create balloons
+            function createBalloon() {
+                const isTarget = Math.random() < 0.4;
+                const letter = isTarget ? targetLetter : letters[Math.floor(Math.random() * letters.length)];
+                
+                const balloon = document.createElement('div');
+                balloon.className = 'balloon';
+                balloon.textContent = letter.letter;
+                balloon.style.background = colors[Math.floor(Math.random() * colors.length)];
+                balloon.style.left = Math.random() * (canvas.offsetWidth - 80) + 'px';
+                balloon.style.top = Math.random() * (canvas.offsetHeight - 150) + 100 + 'px';
+                balloon.dataset.letter = letter.letter;
+                
+                balloon.onclick = function() {
+                    if (this.dataset.letter === targetLetter.letter) {
+                        playSuccessSound();
+                        gameScore += 10;
+                        recordSuccess(targetLetter.letter);
+                        document.getElementById('gameScore').textContent = '🎯 ' + gameScore;
+                        this.style.transform = 'scale(0)';
+                        setTimeout(() => this.remove(), 200);
+                        createBalloon();
+                    } else {
+                        playErrorSound();
+                        gameScore = Math.max(0, gameScore - 5);
+                        recordFailure(targetLetter.letter);
+                        document.getElementById('gameScore').textContent = '🎯 ' + gameScore;
+                        this.style.animation = 'shake 0.5s';
+                    }
+                };
+                
+                canvas.appendChild(balloon);
+                balloons.push(balloon);
+            }
+            
+            // Create initial balloons
+            for (let i = 0; i < 8; i++) {
+                createBalloon();
+            }
+            
+            // Timer
+            const timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('gameTimer').textContent = '⏱️ ' + timeLeft;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    score += gameScore;
+                    document.getElementById('score').textContent = score;
+                    setTimeout(() => backToMenu(), 2000);
+                }
+            }, 1000);
+        }
+
+        // Level 8: Shooter game
+        function renderLevel8() {
+            const activeLetters = getActiveLetters();
+            if (activeLetters.length < 3) {
+                showNotEnoughLetters();
+                return;
+            }
+            
+            const targetLetter = activeLetters[Math.floor(Math.random() * activeLetters.length)];
+            currentQuestion = targetLetter;
+            
+            const content = document.getElementById('gameContent');
+            content.innerHTML = `
+                <div class="game-canvas" id="shooterCanvas">
+                    <div class="game-timer" id="gameTimer">⏱️ 30</div>
+                    <div class="game-score-display" id="gameScore">🎯 0</div>
+                    <div class="game-target">יורה רק על: ${targetLetter.letter}!</div>
+                    <div class="shooter" id="shooter">🚀</div>
+                </div>
+            `;
+            
+            startShooterGame(targetLetter);
+        }
+
+        function startShooterGame(targetLetter) {
+            const canvas = document.getElementById('shooterCanvas');
+            const shooter = document.getElementById('shooter');
+            let gameScore = 0;
+            let timeLeft = 30;
+            let shooterX = canvas.offsetWidth / 2 - 30;
+            shooter.style.left = shooterX + 'px';
+            
+            // Move shooter
+            canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const rect = canvas.getBoundingClientRect();
+                shooterX = Math.max(0, Math.min(canvas.offsetWidth - 60, touch.clientX - rect.left - 30));
+                shooter.style.left = shooterX + 'px';
+            });
+            
+            canvas.addEventListener('mousemove', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                shooterX = Math.max(0, Math.min(canvas.offsetWidth - 60, e.clientX - rect.left - 30));
+                shooter.style.left = shooterX + 'px';
+            });
+            
+            // Shoot
+            canvas.addEventListener('click', () => {
+                const bullet = document.createElement('div');
+                bullet.className = 'bullet';
+                bullet.style.left = (shooterX + 26) + 'px';
+                bullet.style.bottom = '80px';
+                canvas.appendChild(bullet);
+                
+                setTimeout(() => bullet.remove(), 500);
+                
+                // Check collision
+                const fallingLetters = canvas.querySelectorAll('.falling-letter');
+                fallingLetters.forEach(fl => {
+                    const flRect = fl.getBoundingClientRect();
+                    const bulletRect = bullet.getBoundingClientRect();
+                    
+                    if (!(bulletRect.right < flRect.left || 
+                          bulletRect.left > flRect.right || 
+                          bulletRect.bottom < flRect.top || 
+                          bulletRect.top > flRect.bottom)) {
+                        
+                        if (fl.dataset.letter === targetLetter.letter) {
+                            playSuccessSound();
+                            gameScore += 10;
+                            recordSuccess(targetLetter.letter);
+                            fl.style.background = '#51cf66';
+                        } else {
+                            playErrorSound();
+                            gameScore = Math.max(0, gameScore - 5);
+                            recordFailure(targetLetter.letter);
+                            fl.style.background = '#ff6b6b';
+                        }
+                        
+                        document.getElementById('gameScore').textContent = '🎯 ' + gameScore;
+                        setTimeout(() => fl.remove(), 200);
+                    }
+                });
+            });
+            
+            // Drop letters
+            function dropLetter() {
+                if (timeLeft <= 0) return;
+                
+                const isTarget = Math.random() < 0.5;
+                const letter = isTarget ? targetLetter : letters[Math.floor(Math.random() * letters.length)];
+                
+                const fallingLetter = document.createElement('div');
+                fallingLetter.className = 'falling-letter';
+                fallingLetter.textContent = letter.letter;
+                fallingLetter.dataset.letter = letter.letter;
+                fallingLetter.style.left = Math.random() * (canvas.offsetWidth - 80) + 'px';
+                fallingLetter.style.top = '-60px';
+                fallingLetter.style.animationDuration = (2 + Math.random() * 2) + 's';
+                
+                canvas.appendChild(fallingLetter);
+                
+                setTimeout(() => fallingLetter.remove(), 5000);
+                setTimeout(dropLetter, 800);
+            }
+            
+            dropLetter();
+            
+            // Timer
+            const timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('gameTimer').textContent = '⏱️ ' + timeLeft;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    score += gameScore;
+                    document.getElementById('score').textContent = score;
+                    setTimeout(() => backToMenu(), 2000);
+                }
+            }, 1000);
+        }
+
+        function getActiveLetters() {
+            if (!autoManage) return letters;
+            return letters.filter(l => {
+                const stats = letterStats[l.letter];
+                return !stats || stats.active !== false;
+            });
+        }
+
+        function showNotEnoughLetters() {
+            const content = document.getElementById('gameContent');
+            content.innerHTML = `
+                <div class="question-area">
+                    <div class="question-text" style="color: #ff6b6b;">
+                        אין מספיק אותיות פעילות למשחק זה
+                    </div>
+                    <button class="submit-btn" onclick="backToMenu()">חזרה לתפריט</button>
+                </div>
+            `;
+        }
+
+        function getActiveLetters() {
+            return letters.filter(l => {
+                const stats = letterStats[l.letter];
+                return !stats || stats.active !== false;
+            });
         }
 
         // Level 1: Regular letter → select final form
@@ -1030,10 +1483,12 @@
                 { regular: 'צ', final: 'ץ' }
             ];
             
-            // Filter to only pairs that exist in our letters
+            const activeLetters = getActiveLetters();
+            
+            // Filter to only pairs that exist in our active letters
             const availablePairs = finalPairs.filter(pair => 
-                letters.find(l => l.letter === pair.regular) && 
-                letters.find(l => l.letter === pair.final)
+                activeLetters.find(l => l.letter === pair.regular) && 
+                activeLetters.find(l => l.letter === pair.final)
             );
             
             if (availablePairs.length === 0) {
@@ -1410,13 +1865,13 @@
             }
         }
 
-        // Level 5: Complete sequence
+        // Level 5: Complete sequence (6 letters)
         function renderLevel5() {
             const hebrewOrder = 'אבגדהוזחטיכלמנסעפצקרשת';
             const availableLetters = letters.filter(l => hebrewOrder.includes(l.letter))
                 .sort((a, b) => hebrewOrder.indexOf(a.letter) - hebrewOrder.indexOf(b.letter));
             
-            if (availableLetters.length < 3) {
+            if (availableLetters.length < 6) {
                 const content = document.getElementById('gameContent');
                 content.innerHTML = `
                     <div class="question-area">
@@ -1429,15 +1884,18 @@
                 return;
             }
             
-            // Get a random starting point that allows for 3 consecutive letters
-            let startIndex = Math.floor(Math.random() * (availableLetters.length - 2));
+            // Get a random starting point that allows for 6 consecutive letters
+            let startIndex = Math.floor(Math.random() * (availableLetters.length - 5));
             const sequence = [
                 availableLetters[startIndex],
                 availableLetters[startIndex + 1],
-                availableLetters[startIndex + 2]
+                availableLetters[startIndex + 2],
+                availableLetters[startIndex + 3],
+                availableLetters[startIndex + 4],
+                availableLetters[startIndex + 5]
             ];
             
-            const missingIndex = Math.floor(Math.random() * 3);
+            const missingIndex = Math.floor(Math.random() * 6);
             const correct = sequence[missingIndex];
             currentQuestion = correct;
             
@@ -1456,7 +1914,7 @@
             content.innerHTML = `
                 <div class="question-area">
                     <div class="question-text">מה האות החסרה?</div>
-                    <div class="letter-display-large">${displaySequence.join(' ')}</div>
+                    <div class="letter-display-large" style="font-size: 4em;">${displaySequence.join(' ')}</div>
                 </div>
                 <div class="options-grid">
                     ${options.map(opt => `
@@ -1653,6 +2111,329 @@
             }
         });
 
+        // Level 7: Floating Balloons
+        function renderLevel7() {
+            const activeLetters = getActiveLetters();
+            if (activeLetters.length === 0) {
+                document.getElementById('gameContent').innerHTML = `
+                    <div class="question-area">
+                        <div class="question-text" style="color: #ff6b6b;">אין אותיות פעילות</div>
+                        <button class="submit-btn" onclick="backToMenu()">חזרה לתפריט</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            const targetLetter = activeLetters[Math.floor(Math.random() * activeLetters.length)];
+            currentQuestion = targetLetter;
+            let gameScore = 0;
+            let timeLeft = 30;
+            
+            const content = document.getElementById('gameContent');
+            content.innerHTML = `
+                <div class="question-area">
+                    <div class="question-text">תפוס את כל ה-${targetLetter.letter}!</div>
+                    <div style="display: flex; justify-content: space-around; font-size: 1.5em; margin: 20px 0;">
+                        <div>⏱️ זמן: <span id="balloonTimer">30</span></div>
+                        <div>🎯 ניקוד: <span id="balloonScore">0</span></div>
+                    </div>
+                </div>
+                <div id="balloonsContainer" style="position: relative; height: 500px; background: linear-gradient(to bottom, #87CEEB, #E0F6FF); border-radius: 15px; overflow: hidden;"></div>
+            `;
+            
+            const container = document.getElementById('balloonsContainer');
+            const balloons = [];
+            
+            // Create 10 balloons
+            for (let i = 0; i < 10; i++) {
+                const balloon = document.createElement('div');
+                const isTarget = Math.random() < 0.3;
+                const balloonLetter = isTarget ? targetLetter : activeLetters[Math.floor(Math.random() * activeLetters.length)];
+                
+                balloon.innerHTML = balloonLetter.letter;
+                balloon.style.cssText = `
+                    position: absolute;
+                    width: 80px;
+                    height: 100px;
+                    background: ${['#FF6B9D', '#C44569', '#FFA07A', '#98D8C8', '#6C5CE7'][Math.floor(Math.random() * 5)]};
+                    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 2.5em;
+                    color: white;
+                    cursor: pointer;
+                    box-shadow: inset -10px -10px 0 rgba(0,0,0,0.1);
+                    left: ${Math.random() * (container.clientWidth - 80)}px;
+                    top: ${Math.random() * (container.clientHeight - 100)}px;
+                    transition: transform 0.3s;
+                `;
+                
+                balloon.dataset.letter = balloonLetter.letter;
+                balloon.dataset.isTarget = isTarget;
+                
+                balloon.addEventListener('click', function() {
+                    if (this.dataset.isTarget === 'true') {
+                        gameScore += 10;
+                        document.getElementById('balloonScore').textContent = gameScore;
+                        playSuccessSound();
+                        recordSuccess(targetLetter.letter);
+                        this.style.transform = 'scale(1.5)';
+                        this.style.opacity = '0';
+                        setTimeout(() => this.remove(), 300);
+                    } else {
+                        gameScore -= 5;
+                        document.getElementById('balloonScore').textContent = gameScore;
+                        playErrorSound();
+                        recordFailure(targetLetter.letter);
+                        this.style.animation = 'shake 0.5s';
+                    }
+                });
+                
+                container.appendChild(balloon);
+                balloons.push({ element: balloon, vx: (Math.random() - 0.5) * 2, vy: (Math.random() - 0.5) * 2 });
+            }
+            
+            // Animate balloons
+            const animationInterval = setInterval(() => {
+                balloons.forEach(b => {
+                    if (!b.element.parentElement) return;
+                    let x = parseFloat(b.element.style.left);
+                    let y = parseFloat(b.element.style.top);
+                    
+                    x += b.vx;
+                    y += b.vy;
+                    
+                    if (x < 0 || x > container.clientWidth - 80) b.vx *= -1;
+                    if (y < 0 || y > container.clientHeight - 100) b.vy *= -1;
+                    
+                    b.element.style.left = x + 'px';
+                    b.element.style.top = y + 'px';
+                });
+            }, 30);
+            
+            // Timer
+            const timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('balloonTimer').textContent = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    clearInterval(animationInterval);
+                    score += gameScore;
+                    document.getElementById('score').textContent = score;
+                    
+                    content.innerHTML = `
+                        <div class="question-area">
+                            <div class="question-text">סיימת!</div>
+                            <div style="font-size: 3em; margin: 20px 0;">🎈</div>
+                            <div style="font-size: 1.5em;">ניקוד: ${gameScore}</div>
+                            <button class="submit-btn" onclick="nextQuestion()">עוד פעם</button>
+                            <button class="submit-btn" style="background: #868e96;" onclick="backToMenu()">חזרה לתפריט</button>
+                        </div>
+                    `;
+                }
+            }, 1000);
+        }
+
+        // Level 8: Shooting Game
+        function renderLevel8() {
+            const activeLetters = getActiveLetters();
+            if (activeLetters.length === 0) {
+                document.getElementById('gameContent').innerHTML = `
+                    <div class="question-area">
+                        <div class="question-text" style="color: #ff6b6b;">אין אותיות פעילות</div>
+                        <button class="submit-btn" onclick="backToMenu()">חזרה לתפריט</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            const targetLetter = activeLetters[Math.floor(Math.random() * activeLetters.length)];
+            currentQuestion = targetLetter;
+            let gameScore = 0;
+            let timeLeft = 30;
+            let shipX = 150;
+            
+            const content = document.getElementById('gameContent');
+            content.innerHTML = `
+                <div class="question-area">
+                    <div class="question-text">ירה על כל ה-${targetLetter.letter}!</div>
+                    <div style="display: flex; justify-content: space-around; font-size: 1.5em; margin: 20px 0;">
+                        <div>⏱️ זמן: <span id="shootTimer">30</span></div>
+                        <div>🎯 ניקוד: <span id="shootScore">0</span></div>
+                    </div>
+                </div>
+                <div id="gameCanvas" style="position: relative; height: 500px; background: linear-gradient(to bottom, #1a1a2e, #16213e); border-radius: 15px; overflow: hidden; touch-action: none;"></div>
+            `;
+            
+            const canvas = document.getElementById('gameCanvas');
+            
+            // Ship
+            const ship = document.createElement('div');
+            ship.innerHTML = '🚀';
+            ship.style.cssText = `
+                position: absolute;
+                bottom: 20px;
+                left: ${shipX}px;
+                font-size: 3em;
+                transition: left 0.1s;
+            `;
+            canvas.appendChild(ship);
+            
+            // Move ship
+            canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const rect = canvas.getBoundingClientRect();
+                shipX = Math.max(0, Math.min(canvas.clientWidth - 60, touch.clientX - rect.left - 30));
+                ship.style.left = shipX + 'px';
+            });
+            
+            canvas.addEventListener('mousemove', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                shipX = Math.max(0, Math.min(canvas.clientWidth - 60, e.clientX - rect.left - 30));
+                ship.style.left = shipX + 'px';
+            });
+            
+            // Shoot
+            canvas.addEventListener('click', () => shoot());
+            canvas.addEventListener('touchstart', (e) => {
+                if (e.target === canvas) shoot();
+            });
+            
+            function shoot() {
+                const bullet = document.createElement('div');
+                bullet.style.cssText = `
+                    position: absolute;
+                    bottom: 80px;
+                    left: ${shipX + 25}px;
+                    width: 4px;
+                    height: 15px;
+                    background: yellow;
+                    border-radius: 2px;
+                `;
+                canvas.appendChild(bullet);
+                
+                const bulletInterval = setInterval(() => {
+                    let y = parseFloat(bullet.style.bottom);
+                    bullet.style.bottom = (y + 10) + 'px';
+                    
+                    if (y > canvas.clientHeight) {
+                        clearInterval(bulletInterval);
+                        bullet.remove();
+                    }
+                    
+                    // Check collision
+                    document.querySelectorAll('.falling-letter').forEach(letter => {
+                        const bulletRect = bullet.getBoundingClientRect();
+                        const letterRect = letter.getBoundingClientRect();
+                        
+                        if (!(bulletRect.right < letterRect.left || 
+                              bulletRect.left > letterRect.right || 
+                              bulletRect.bottom < letterRect.top || 
+                              bulletRect.top > letterRect.bottom)) {
+                            
+                            if (letter.dataset.letter === targetLetter.letter) {
+                                gameScore += 10;
+                                playSuccessSound();
+                                recordSuccess(targetLetter.letter);
+                            } else {
+                                gameScore -= 5;
+                                playErrorSound();
+                                recordFailure(targetLetter.letter);
+                            }
+                            
+                            document.getElementById('shootScore').textContent = gameScore;
+                            letter.remove();
+                            bullet.remove();
+                            clearInterval(bulletInterval);
+                        }
+                    });
+                }, 20);
+            }
+            
+            // Spawn falling letters
+            const spawnInterval = setInterval(() => {
+                const fallingLetter = document.createElement('div');
+                const isTarget = Math.random() < 0.4;
+                const letterObj = isTarget ? targetLetter : activeLetters[Math.floor(Math.random() * activeLetters.length)];
+                
+                fallingLetter.className = 'falling-letter';
+                fallingLetter.innerHTML = letterObj.letter;
+                fallingLetter.dataset.letter = letterObj.letter;
+                fallingLetter.style.cssText = `
+                    position: absolute;
+                    top: -50px;
+                    left: ${Math.random() * (canvas.clientWidth - 50)}px;
+                    font-size: 2.5em;
+                    color: ${isTarget ? '#51cf66' : '#ff6b6b'};
+                    font-weight: bold;
+                `;
+                canvas.appendChild(fallingLetter);
+                
+                const fallInterval = setInterval(() => {
+                    let y = parseFloat(fallingLetter.style.top);
+                    fallingLetter.style.top = (y + 3) + 'px';
+                    
+                    if (y > canvas.clientHeight) {
+                        clearInterval(fallInterval);
+                        fallingLetter.remove();
+                    }
+                }, 30);
+            }, 1500);
+            
+            // Timer
+            const timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('shootTimer').textContent = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    clearInterval(spawnInterval);
+                    score += gameScore;
+                    document.getElementById('score').textContent = score;
+                    
+                    content.innerHTML = `
+                        <div class="question-area">
+                            <div class="question-text">סיימת!</div>
+                            <div style="font-size: 3em; margin: 20px 0;">🚀</div>
+                            <div style="font-size: 1.5em;">ניקוד: ${gameScore}</div>
+                            <button class="submit-btn" onclick="nextQuestion()">עוד פעם</button>
+                            <button class="submit-btn" style="background: #868e96;" onclick="backToMenu()">חזרה לתפריט</button>
+                        </div>
+                    `;
+                }
+            }, 1000);
+        }
+
+        function saveStats() {
+            localStorage.setItem('letterStats', JSON.stringify(letterStats));
+            localStorage.setItem('autoManage', autoManage.toString());
+        }
+
+        function recordSuccess(letter) {
+            if (!letterStats[letter]) {
+                letterStats[letter] = { successes: 0, failures: 0, active: true };
+            }
+            letterStats[letter].successes++;
+            
+            // Auto-manage: deactivate after 10 successes
+            if (autoManage && letterStats[letter].successes >= 10) {
+                letterStats[letter].active = false;
+            }
+            
+            saveStats();
+        }
+
+        function recordFailure(letter) {
+            if (!letterStats[letter]) {
+                letterStats[letter] = { successes: 0, failures: 0, active: true };
+            }
+            letterStats[letter].failures++;
+            saveStats();
+        }
+
         function checkAnswer(userAnswer, correctAnswer) {
             const clickedButton = event.target;
             
@@ -1663,16 +2444,27 @@
                 
                 clickedButton.classList.add('correct');
                 playSuccessSound();
+                recordSuccess(correctAnswer);
                 score += 10;
                 document.getElementById('score').textContent = score;
+                
+                // Play audio after success
+                setTimeout(() => {
+                    const letterObj = letters.find(l => l.letter === correctAnswer);
+                    if (letterObj && letterObj.audio) {
+                        playLetterAudio(letters.indexOf(letterObj));
+                    }
+                }, 500);
+                
                 setTimeout(() => {
                     nextQuestion();
-                }, 1500);
+                }, 2000);
             } else {
                 // Wrong answer!
                 clickedButton.classList.add('wrong');
                 clickedButton.disabled = true;
                 playErrorSound();
+                recordFailure(correctAnswer);
                 
                 setTimeout(() => {
                     clickedButton.classList.remove('wrong');
