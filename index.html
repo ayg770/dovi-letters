@@ -800,36 +800,40 @@
 
             <div id="levelSelection" class="level-selection">
                 <div class="level-card" onclick="startLevel(1)">
-                    <h3>🎯 רמה 1</h3>
-                    <p>מצא את האות הסופית</p>
+                    <h3 style="font-size: 3em;">🎯</h3>
+                    <p>אותיות סופיות</p>
                 </div>
                 <div class="level-card" onclick="startLevel(2)">
-                    <h3>🔊 רמה 2</h3>
-                    <p>מצא את האות לפי צליל</p>
+                    <h3 style="font-size: 3em;">🔊</h3>
+                    <p>האזנה</p>
                 </div>
                 <div class="level-card" onclick="startLevel(3)">
-                    <h3>✍️ רמה 3</h3>
-                    <p>עקוב עם האצבע על האות</p>
+                    <h3 style="font-size: 3em;">✍️</h3>
+                    <p>ציור אות</p>
                 </div>
                 <div class="level-card" onclick="startLevel(4)">
-                    <h3>🔢 רמה 4</h3>
-                    <p>סדר את האותיות</p>
+                    <h3 style="font-size: 3em;">🔢</h3>
+                    <p>סידור אותיות</p>
                 </div>
                 <div class="level-card" onclick="startLevel(5)">
-                    <h3>🧩 רמה 5</h3>
-                    <p>השלמת רצף</p>
+                    <h3 style="font-size: 3em;">🧩</h3>
+                    <p>רצף אותיות</p>
                 </div>
                 <div class="level-card" onclick="startLevel(6)">
-                    <h3>👨‍👩‍👧 רמה 6</h3>
-                    <p>מיון רגילות וסופיות</p>
+                    <h3 style="font-size: 3em;">🔍</h3>
+                    <p>מצא ההבדל</p>
                 </div>
                 <div class="level-card" onclick="startLevel(7)">
-                    <h3>🎈 רמה 7</h3>
-                    <p>בלונים מרחפים</p>
+                    <h3 style="font-size: 3em;">🧩</h3>
+                    <p>השלם את האות</p>
                 </div>
                 <div class="level-card" onclick="startLevel(8)">
-                    <h3>🚀 רמה 8</h3>
-                    <p>משחק יריות</p>
+                    <h3 style="font-size: 3em;">🎈</h3>
+                    <p>בלונים</p>
+                </div>
+                <div class="level-card" onclick="startLevel(9)">
+                    <h3 style="font-size: 3em;">🦆</h3>
+                    <p>ברווז רעב</p>
                 </div>
             </div>
 
@@ -1235,89 +1239,331 @@
                 case 8:
                     renderLevel8();
                     break;
+                case 9:
+                    renderLevel9();
+                    break;
             }
         }
 
-        // Level 7: Balloon game
+        // Level 7: Complete the Letter (drag puzzle pieces)
         function renderLevel7() {
             const activeLetters = getActiveLetters();
-            if (activeLetters.length < 3) {
-                showNotEnoughLetters();
+            if (activeLetters.length === 0) {
+                document.getElementById('gameContent').innerHTML = `
+                    <div class="question-area">
+                        <div class="question-text" style="color: #ff6b6b;">אין אותיות פעילות</div>
+                        <button class="submit-btn" onclick="backToMenu()">חזרה לתפריט</button>
+                    </div>
+                `;
                 return;
             }
             
             const targetLetter = activeLetters[Math.floor(Math.random() * activeLetters.length)];
             currentQuestion = targetLetter;
             
+            // Define missing parts for different letters
+            const letterParts = {
+                'כ': { correct: 'רגל ימנית', others: ['רגל שמאלית', 'קו אמצעי', 'עיגול'] },
+                'ל': { correct: 'רגל תחתונה', others: ['קו אמצעי', 'עיגול קטן', 'קו אלכסוני'] },
+                'מ': { correct: 'רגל שמאלית', others: ['רגל ימנית', 'קו עליון', 'נקודה'] },
+                'ם': { correct: 'סגירת ריבוע', others: ['פתיחת ריבוע', 'קו אמצעי', 'עיגול'] },
+                'נ': { correct: 'רגל ימנית', others: ['רגל שמאלית', 'קו עליון', 'עיגול קטן'] },
+                'ן': { correct: 'זנב ארוך', others: ['זנב קצר', 'קו אמצעי', 'עיגול'] },
+                'פ': { correct: 'רגל שמאלית', others: ['רגל ימנית', 'קו אמצעי', 'נקודה'] },
+                'ף': { correct: 'זנב ארוך', others: ['זנב קצר', 'קו עליון', 'עיגול'] }
+            };
+            
+            const parts = letterParts[targetLetter.letter] || { correct: 'חלק חסר', others: ['חלק 1', 'חלק 2', 'חלק 3'] };
+            const allParts = [parts.correct, ...parts.others];
+            const shuffledParts = shuffleArray(allParts);
+            
             const content = document.getElementById('gameContent');
             content.innerHTML = `
-                <div class="game-canvas" id="balloonCanvas">
-                    <div class="game-timer" id="gameTimer">⏱️ 30</div>
-                    <div class="game-score-display" id="gameScore">🎯 0</div>
-                    <div class="game-target">תפוס את כל ה-${targetLetter.letter}!</div>
+                <div class="question-area">
+                    <div class="question-text">השלם את האות: ${targetLetter.name}</div>
+                </div>
+                <div style="text-align: center; margin: 30px 0;">
+                    <div id="incompleteLetter" style="font-size: 10em; color: #e9ecef; position: relative; display: inline-block;">
+                        ${targetLetter.letter}
+                        <div id="dropZone" style="position: absolute; top: 50%; left: 50%; width: 80px; height: 80px; border: 4px dashed #667eea; border-radius: 10px; transform: translate(-50%, -50%); background: rgba(255,255,255,0.3);"></div>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; padding: 20px;">
+                    ${shuffledParts.map((part, idx) => `
+                        <div class="puzzle-piece" draggable="true" data-part="${part}" data-correct="${part === parts.correct}" id="piece-${idx}"
+                             style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 20px 30px; border-radius: 15px; cursor: move; font-size: 1.2em; box-shadow: 0 4px 10px rgba(0,0,0,0.2); user-select: none;">
+                            ${part}
+                        </div>
+                    `).join('')}
                 </div>
             `;
             
-            startBalloonGame(targetLetter);
+            setupPuzzleDrag();
         }
 
-        function startBalloonGame(targetLetter) {
-            const canvas = document.getElementById('balloonCanvas');
+        function setupPuzzleDrag() {
+            const pieces = document.querySelectorAll('.puzzle-piece');
+            const dropZone = document.getElementById('dropZone');
+            let draggedPiece = null;
+            
+            pieces.forEach(piece => {
+                // Touch events
+                piece.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    draggedPiece = piece;
+                    piece.style.opacity = '0.5';
+                    piece.style.transform = 'scale(1.1)';
+                }, { passive: false });
+                
+                piece.addEventListener('touchmove', (e) => {
+                    if (!draggedPiece) return;
+                    e.preventDefault();
+                    const touch = e.touches[0];
+                    piece.style.position = 'fixed';
+                    piece.style.left = (touch.clientX - 50) + 'px';
+                    piece.style.top = (touch.clientY - 25) + 'px';
+                    piece.style.zIndex = '1000';
+                }, { passive: false });
+                
+                piece.addEventListener('touchend', (e) => {
+                    if (!draggedPiece) return;
+                    e.preventDefault();
+                    
+                    const touch = e.changedTouches[0];
+                    const dropRect = dropZone.getBoundingClientRect();
+                    
+                    const isOver = (
+                        touch.clientX >= dropRect.left &&
+                        touch.clientX <= dropRect.right &&
+                        touch.clientY >= dropRect.top &&
+                        touch.clientY <= dropRect.bottom
+                    );
+                    
+                    checkPuzzleDrop(draggedPiece, isOver);
+                    
+                    draggedPiece.style.position = '';
+                    draggedPiece.style.left = '';
+                    draggedPiece.style.top = '';
+                    draggedPiece.style.zIndex = '';
+                    draggedPiece.style.opacity = '1';
+                    draggedPiece.style.transform = '';
+                    draggedPiece = null;
+                }, { passive: false });
+                
+                // Mouse events
+                piece.addEventListener('dragstart', (e) => {
+                    draggedPiece = piece;
+                    piece.style.opacity = '0.5';
+                });
+                
+                piece.addEventListener('dragend', (e) => {
+                    piece.style.opacity = '1';
+                });
+            });
+            
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.style.background = 'rgba(81, 207, 102, 0.3)';
+            });
+            
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.style.background = 'rgba(255,255,255,0.3)';
+            });
+            
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.style.background = 'rgba(255,255,255,0.3)';
+                checkPuzzleDrop(draggedPiece, true);
+            });
+        }
+
+        function checkPuzzleDrop(piece, isOver) {
+            if (!piece || !isOver) return;
+            
+            const isCorrect = piece.dataset.correct === 'true';
+            
+            if (isCorrect) {
+                // Correct piece!
+                piece.style.opacity = '0';
+                piece.style.transform = 'scale(0)';
+                document.getElementById('incompleteLetter').style.color = '#51cf66';
+                document.getElementById('dropZone').style.display = 'none';
+                
+                playSuccessSound();
+                recordSuccess(currentQuestion.letter);
+                score += 10;
+                document.getElementById('score').textContent = score;
+                
+                setTimeout(() => {
+                    nextQuestion();
+                }, 1500);
+            } else {
+                // Wrong piece!
+                piece.style.animation = 'shake 0.5s';
+                playErrorSound();
+                recordFailure(currentQuestion.letter);
+                setTimeout(() => {
+                    piece.style.animation = '';
+                }, 500);
+            }
+        }
+
+        // Level 8: Balloon game with auto-replacement
+        function renderLevel8() {
+            const activeLetters = getActiveLetters();
+            if (activeLetters.length === 0) {
+                document.getElementById('gameContent').innerHTML = `
+                    <div class="question-area">
+                        <div class="question-text" style="color: #ff6b6b;">אין אותיות פעילות</div>
+                        <button class="submit-btn" onclick="backToMenu()">חזרה לתפריט</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            const targetLetter = activeLetters[Math.floor(Math.random() * activeLetters.length)];
+            currentQuestion = targetLetter;
             let gameScore = 0;
             let timeLeft = 30;
+            
+            const content = document.getElementById('gameContent');
+            content.innerHTML = `
+                <div class="question-area">
+                    <div class="question-text">תפוס את כל ה-${targetLetter.letter}!</div>
+                    <div style="display: flex; justify-content: space-around; font-size: 1.5em; margin: 20px 0;">
+                        <div>⏱️ זמן: <span id="balloonTimer">30</span></div>
+                        <div>🎯 ניקוד: <span id="balloonScore">0</span></div>
+                    </div>
+                </div>
+                <div id="balloonsContainer" style="position: relative; height: 500px; background: linear-gradient(to bottom, #87CEEB, #E0F6FF); border-radius: 15px; overflow: hidden;"></div>
+            `;
+            
+            const container = document.getElementById('balloonsContainer');
             const balloons = [];
-            const colors = ['#ff6b6b', '#51cf66', '#339af0', '#ffd43b', '#ff6347', '#9c88ff'];
             
-            // Create balloons
-            function createBalloon() {
-                const isTarget = Math.random() < 0.4;
-                const letter = isTarget ? targetLetter : letters[Math.floor(Math.random() * letters.length)];
-                
-                const balloon = document.createElement('div');
-                balloon.className = 'balloon';
-                balloon.textContent = letter.letter;
-                balloon.style.background = colors[Math.floor(Math.random() * colors.length)];
-                balloon.style.left = Math.random() * (canvas.offsetWidth - 80) + 'px';
-                balloon.style.top = Math.random() * (canvas.offsetHeight - 150) + 100 + 'px';
-                balloon.dataset.letter = letter.letter;
-                
-                balloon.onclick = function() {
-                    if (this.dataset.letter === targetLetter.letter) {
-                        playSuccessSound();
-                        gameScore += 10;
-                        recordSuccess(targetLetter.letter);
-                        document.getElementById('gameScore').textContent = '🎯 ' + gameScore;
-                        this.style.transform = 'scale(0)';
-                        setTimeout(() => this.remove(), 200);
-                        createBalloon();
-                    } else {
-                        playErrorSound();
-                        gameScore = Math.max(0, gameScore - 5);
-                        recordFailure(targetLetter.letter);
-                        document.getElementById('gameScore').textContent = '🎯 ' + gameScore;
-                        this.style.animation = 'shake 0.5s';
-                    }
-                };
-                
-                canvas.appendChild(balloon);
-                balloons.push(balloon);
-            }
-            
-            // Create initial balloons
-            for (let i = 0; i < 8; i++) {
+            // Create 10 balloons
+            for (let i = 0; i < 10; i++) {
                 createBalloon();
             }
+            
+            function createBalloon() {
+                const isTarget = Math.random() < 0.3;
+                const balloonLetter = isTarget ? targetLetter : activeLetters[Math.floor(Math.random() * activeLetters.length)];
+                
+                const balloon = document.createElement('div');
+                balloon.innerHTML = balloonLetter.letter;
+                balloon.style.cssText = `
+                    position: absolute;
+                    width: 80px;
+                    height: 100px;
+                    background: ${['#FF6B9D', '#C44569', '#FFA07A', '#98D8C8', '#6C5CE7'][Math.floor(Math.random() * 5)]};
+                    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 2.5em;
+                    color: white;
+                    cursor: pointer;
+                    box-shadow: inset -10px -10px 0 rgba(0,0,0,0.1);
+                    left: ${Math.random() * (container.clientWidth - 80)}px;
+                    top: ${Math.random() * (container.clientHeight - 100)}px;
+                    transition: transform 0.3s, opacity 0.3s;
+                `;
+                
+                balloon.dataset.letter = balloonLetter.letter;
+                balloon.dataset.isTarget = isTarget;
+                balloon.dataset.clickedTime = 0;
+                
+                balloon.addEventListener('click', function() {
+                    if (this.dataset.clickedTime > 0) return; // Already clicked
+                    
+                    if (this.dataset.isTarget === 'true') {
+                        gameScore += 10;
+                        document.getElementById('balloonScore').textContent = gameScore;
+                        playSuccessSound();
+                        recordSuccess(targetLetter.letter);
+                        this.style.transform = 'scale(1.5)';
+                        this.style.opacity = '0';
+                        this.dataset.clickedTime = Date.now();
+                        setTimeout(() => this.remove(), 300);
+                        balloons.splice(balloons.indexOf(this.balloonData), 1);
+                        createBalloon();
+                    } else {
+                        gameScore -= 5;
+                        document.getElementById('balloonScore').textContent = gameScore;
+                        playErrorSound();
+                        recordFailure(targetLetter.letter);
+                        this.style.animation = 'shake 0.5s';
+                    }
+                });
+                
+                container.appendChild(balloon);
+                const balloonData = { 
+                    element: balloon, 
+                    vx: (Math.random() - 0.5) * 2, 
+                    vy: (Math.random() - 0.5) * 2,
+                    createdAt: Date.now()
+                };
+                balloons.push(balloonData);
+                balloon.balloonData = balloonData;
+            }
+            
+            // Animate balloons
+            const animationInterval = setInterval(() => {
+                balloons.forEach(b => {
+                    if (!b.element.parentElement) return;
+                    let x = parseFloat(b.element.style.left);
+                    let y = parseFloat(b.element.style.top);
+                    
+                    x += b.vx;
+                    y += b.vy;
+                    
+                    if (x < 0 || x > container.clientWidth - 80) b.vx *= -1;
+                    if (y < 0 || y > container.clientHeight - 100) b.vy *= -1;
+                    
+                    b.element.style.left = x + 'px';
+                    b.element.style.top = y + 'px';
+                });
+            }, 30);
+            
+            // Replace unclicked balloons every 3-4 seconds
+            const replaceInterval = setInterval(() => {
+                const now = Date.now();
+                balloons.forEach(b => {
+                    if (b.element.dataset.clickedTime == 0 && (now - b.createdAt) > 3000) {
+                        b.element.style.opacity = '0';
+                        setTimeout(() => {
+                            if (b.element.parentElement) {
+                                b.element.remove();
+                                balloons.splice(balloons.indexOf(b), 1);
+                                createBalloon();
+                            }
+                        }, 300);
+                    }
+                });
+            }, 500);
             
             // Timer
             const timerInterval = setInterval(() => {
                 timeLeft--;
-                document.getElementById('gameTimer').textContent = '⏱️ ' + timeLeft;
+                document.getElementById('balloonTimer').textContent = timeLeft;
                 
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
+                    clearInterval(animationInterval);
+                    clearInterval(replaceInterval);
                     score += gameScore;
                     document.getElementById('score').textContent = score;
-                    setTimeout(() => backToMenu(), 2000);
+                    
+                    content.innerHTML = `
+                        <div class="question-area">
+                            <div class="question-text">סיימת!</div>
+                            <div style="font-size: 3em; margin: 20px 0;">🎈</div>
+                            <div style="font-size: 1.5em;">ניקוד: ${gameScore}</div>
+                            <button class="submit-btn" onclick="nextQuestion()">עוד פעם</button>
+                            <button class="submit-btn" style="background: #868e96;" onclick="backToMenu()">חזרה לתפריט</button>
+                        </div>
+                    `;
                 }
             }, 1000);
         }
@@ -1441,6 +1687,158 @@
                     score += gameScore;
                     document.getElementById('score').textContent = score;
                     setTimeout(() => backToMenu(), 2000);
+                }
+            }, 1000);
+        }
+
+        // Level 9: Hungry Duck - catch the letters
+        function renderLevel9() {
+            const activeLetters = getActiveLetters();
+            if (activeLetters.length === 0) {
+                document.getElementById('gameContent').innerHTML = `
+                    <div class="question-area">
+                        <div class="question-text" style="color: #ff6b6b;">אין אותיות פעילות</div>
+                        <button class="submit-btn" onclick="backToMenu()">חזרה לתפריט</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            let targetLetter = activeLetters[Math.floor(Math.random() * activeLetters.length)];
+            currentQuestion = targetLetter;
+            let gameScore = 0;
+            let timeLeft = 30;
+            let speed = 3;
+            
+            const content = document.getElementById('gameContent');
+            content.innerHTML = `
+                <div class="question-area">
+                    <div class="question-text" id="duckInstruction">תפוס את ה-${targetLetter.letter}!</div>
+                    <div style="display: flex; justify-content: space-around; font-size: 1.5em; margin: 20px 0;">
+                        <div>⏱️ <span id="duckTimer">30</span></div>
+                        <div>🎯 <span id="duckScore">0</span></div>
+                    </div>
+                </div>
+                <div id="duckCanvas" style="position: relative; height: 500px; background: linear-gradient(to right, #ffd89b, #19547b); border-radius: 15px; overflow: hidden;">
+                    <div id="duck" style="position: absolute; left: 50px; top: 50%; transform: translateY(-50%); font-size: 4em; cursor: pointer; transition: transform 0.2s;">🦆</div>
+                </div>
+            `;
+            
+            const canvas = document.getElementById('duckCanvas');
+            const duck = document.getElementById('duck');
+            const fallingLetters = [];
+            let isDuckOpen = false;
+            
+            const letterIndex = letters.findIndex(l => l.letter === targetLetter.letter);
+            if (letterIndex >= 0) {
+                setTimeout(() => playLetterAudio(letterIndex), 500);
+            }
+            
+            duck.addEventListener('click', () => {
+                if (isDuckOpen) return;
+                isDuckOpen = true;
+                duck.style.transform = 'translateY(-50%) scale(1.2)';
+                
+                const duckRect = duck.getBoundingClientRect();
+                fallingLetters.forEach(letterObj => {
+                    const letterRect = letterObj.element.getBoundingClientRect();
+                    
+                    if (!(letterRect.right < duckRect.left || 
+                          letterRect.left > duckRect.right || 
+                          letterRect.bottom < duckRect.top || 
+                          letterRect.top > duckRect.bottom)) {
+                        
+                        if (letterObj.letter === targetLetter.letter) {
+                            gameScore += 10;
+                            document.getElementById('duckScore').textContent = gameScore;
+                            playSuccessSound();
+                            recordSuccess(targetLetter.letter);
+                            letterObj.element.style.opacity = '0';
+                            setTimeout(() => letterObj.element.remove(), 200);
+                            fallingLetters.splice(fallingLetters.indexOf(letterObj), 1);
+                        } else {
+                            gameScore -= 5;
+                            document.getElementById('duckScore').textContent = gameScore;
+                            playErrorSound();
+                            recordFailure(targetLetter.letter);
+                            letterObj.element.style.animation = 'shake 0.5s';
+                        }
+                    }
+                });
+                
+                setTimeout(() => {
+                    duck.style.transform = 'translateY(-50%)';
+                    isDuckOpen = false;
+                }, 300);
+            });
+            
+            function spawnLetter() {
+                if (timeLeft <= 0) return;
+                
+                const isTarget = Math.random() < 0.4;
+                const letterObj = isTarget ? targetLetter : activeLetters[Math.floor(Math.random() * activeLetters.length)];
+                
+                const fallingLetter = document.createElement('div');
+                fallingLetter.innerHTML = letterObj.letter;
+                fallingLetter.style.cssText = `
+                    position: absolute;
+                    top: -50px;
+                    left: ${100 + Math.random() * (canvas.clientWidth - 150)}px;
+                    font-size: 2.5em;
+                    color: #fff;
+                    font-weight: bold;
+                    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+                `;
+                canvas.appendChild(fallingLetter);
+                
+                const letterData = { element: fallingLetter, letter: letterObj.letter, y: -50 };
+                fallingLetters.push(letterData);
+                
+                const fallInterval = setInterval(() => {
+                    letterData.y += speed;
+                    fallingLetter.style.top = letterData.y + 'px';
+                    
+                    if (letterData.y > canvas.clientHeight) {
+                        clearInterval(fallInterval);
+                        fallingLetter.remove();
+                        fallingLetters.splice(fallingLetters.indexOf(letterData), 1);
+                    }
+                }, 30);
+                
+                setTimeout(spawnLetter, 1500);
+            }
+            
+            spawnLetter();
+            
+            const timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('duckTimer').textContent = timeLeft;
+                
+                if (timeLeft === 20 || timeLeft === 10) {
+                    targetLetter = activeLetters[Math.floor(Math.random() * activeLetters.length)];
+                    currentQuestion = targetLetter;
+                    document.getElementById('duckInstruction').textContent = `תפוס את ה-${targetLetter.letter}!`;
+                    
+                    const idx = letters.findIndex(l => l.letter === targetLetter.letter);
+                    if (idx >= 0) playLetterAudio(idx);
+                    
+                    speed += 1;
+                }
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    score += gameScore;
+                    document.getElementById('score').textContent = score;
+                    
+                    content.innerHTML = `
+                        <div class="question-area">
+                            <div class="question-text">סיימת!</div>
+                            <div style="font-size: 3em; margin: 20px 0;">🦆</div>
+                            <div style="font-size: 1.5em;">ניקוד: ${gameScore}</div>
+                            <button class="submit-btn" onclick="nextQuestion()">עוד פעם</button>
+                            <button class="submit-btn" style="background: #868e96;" onclick="backToMenu()">חזרה לתפריט</button>
+                        </div>
+                    `;
                 }
             }, 1000);
         }
@@ -1865,18 +2263,21 @@
             }
         }
 
-        // Level 5: Complete sequence (6 letters)
+        // Level 5: Complete sequence (5-6 letters, missing in middle)
         function renderLevel5() {
             const hebrewOrder = 'אבגדהוזחטיכלמנסעפצקרשת';
             const availableLetters = letters.filter(l => hebrewOrder.includes(l.letter))
                 .sort((a, b) => hebrewOrder.indexOf(a.letter) - hebrewOrder.indexOf(b.letter));
             
-            if (availableLetters.length < 6) {
+            const activeLetters = getActiveLetters().filter(l => hebrewOrder.includes(l.letter))
+                .sort((a, b) => hebrewOrder.indexOf(a.letter) - hebrewOrder.indexOf(b.letter));
+            
+            if (activeLetters.length < 5) {
                 const content = document.getElementById('gameContent');
                 content.innerHTML = `
                     <div class="question-area">
                         <div class="question-text" style="color: #ff6b6b;">
-                            אין מספיק אותיות במערכת לרמה זו
+                            אין מספיק אותיות פעילות לרמה זו
                         </div>
                         <button class="submit-btn" onclick="backToMenu()">חזרה לתפריט</button>
                     </div>
@@ -1884,18 +2285,18 @@
                 return;
             }
             
-            // Get a random starting point that allows for 6 consecutive letters
-            let startIndex = Math.floor(Math.random() * (availableLetters.length - 5));
-            const sequence = [
-                availableLetters[startIndex],
-                availableLetters[startIndex + 1],
-                availableLetters[startIndex + 2],
-                availableLetters[startIndex + 3],
-                availableLetters[startIndex + 4],
-                availableLetters[startIndex + 5]
-            ];
+            // Choose sequence length (5 or 6)
+            const seqLength = Math.random() < 0.5 ? 5 : 6;
             
-            const missingIndex = Math.floor(Math.random() * 6);
+            // Get a random starting point that allows for consecutive letters
+            let startIndex = Math.floor(Math.random() * (activeLetters.length - seqLength + 1));
+            const sequence = [];
+            for (let i = 0; i < seqLength; i++) {
+                sequence.push(activeLetters[startIndex + i]);
+            }
+            
+            // Missing letter in middle (not first or last)
+            const missingIndex = Math.floor(Math.random() * (seqLength - 2)) + 1; // 1 to seqLength-2
             const correct = sequence[missingIndex];
             currentQuestion = correct;
             
@@ -1903,7 +2304,7 @@
             
             let options = [correct];
             while (options.length < 4) {
-                const random = letters[Math.floor(Math.random() * letters.length)];
+                const random = activeLetters[Math.floor(Math.random() * activeLetters.length)];
                 if (!options.find(o => o.letter === random.letter)) {
                     options.push(random);
                 }
@@ -1914,7 +2315,7 @@
             content.innerHTML = `
                 <div class="question-area">
                     <div class="question-text">מה האות החסרה?</div>
-                    <div class="letter-display-large" style="font-size: 4em;">${displaySequence.join(' ')}</div>
+                    <div class="letter-display-large" style="font-size: 3.5em; letter-spacing: 0.2em;">${displaySequence.join(' ')}</div>
                 </div>
                 <div class="options-grid">
                     ${options.map(opt => `
@@ -1924,192 +2325,88 @@
             `;
         }
 
-        // Level 6: Click to sort regular and final letters with choice bubble
+        // Level 6: Find the Different Letter
         function renderLevel6() {
-            const finalLetters = letters.filter(l => l.name.includes('סופית'));
-            
-            if (finalLetters.length === 0) {
+            const activeLetters = getActiveLetters();
+            if (activeLetters.length < 2) {
                 const content = document.getElementById('gameContent');
                 content.innerHTML = `
                     <div class="question-area">
-                        <div class="question-text" style="color: #ff6b6b;">
-                            אין אותיות סופיות במערכת
-                        </div>
+                        <div class="question-text" style="color: #ff6b6b;">אין מספיק אותיות פעילות</div>
                         <button class="submit-btn" onclick="backToMenu()">חזרה לתפריט</button>
                     </div>
                 `;
                 return;
             }
             
-            const regularLetters = letters.filter(l => !l.name.includes('סופית'));
-            const selectedFinal = shuffleArray(finalLetters).slice(0, 2);
-            const selectedRegular = shuffleArray(regularLetters).slice(0, 3);
-            const allLetters = shuffleArray([...selectedFinal, ...selectedRegular]);
+            // Pick 2 different letters
+            const correctLetter = activeLetters[Math.floor(Math.random() * activeLetters.length)];
+            let differentLetter;
+            do {
+                differentLetter = activeLetters[Math.floor(Math.random() * activeLetters.length)];
+            } while (differentLetter.letter === correctLetter.letter);
             
-            currentQuestion = { final: selectedFinal, regular: selectedRegular };
+            currentQuestion = differentLetter;
+            
+            // Create array: 3 same, 1 different
+            const letters4 = [
+                { letter: correctLetter.letter, isDifferent: false },
+                { letter: correctLetter.letter, isDifferent: false },
+                { letter: correctLetter.letter, isDifferent: false },
+                { letter: differentLetter.letter, isDifferent: true }
+            ];
+            
+            // Shuffle
+            const shuffled = shuffleArray(letters4);
             
             const content = document.getElementById('gameContent');
             content.innerHTML = `
                 <div class="question-area">
-                    <div class="question-text">מיין את האותיות<br><small style="color: #868e96;">לחץ על אות ובחר: רגילה או סופית</small></div>
+                    <div class="question-text">לחץ על האות השונה</div>
                 </div>
-                <div class="drag-container">
-                    <div class="sort-target" id="regularTarget" style="background: #e7f5ff; border-color: #1971c2; min-height: 150px;">
-                        <div style="color: #1971c2; font-weight: bold; font-size: 1.3em;" id="regularPlaceholder">אותיות רגילות</div>
-                    </div>
-                    <div class="letters-to-sort" id="lettersPool" style="min-height: 150px; position: relative;">
-                        ${allLetters.map((l, i) => `
-                            <div class="draggable-letter" data-letter="${l.letter}" data-isfinal="${l.name.includes('סופית')}" onclick="showChoiceBubble(this, event)" style="cursor: pointer;">
-                                ${l.letter}
-                            </div>
-                        `).join('')}
-                    </div>
-                    <div class="sort-target" id="finalTarget" style="background: #fff0f6; border-color: #c2255c; min-height: 150px;">
-                        <div style="color: #c2255c; font-weight: bold; font-size: 1.3em;" id="finalPlaceholder">אותיות סופיות</div>
-                    </div>
-                </div>
-                <button class="submit-btn" onclick="checkSorting()">בדוק מיון</button>
-                
-                <!-- Choice bubble -->
-                <div id="choiceBubble" style="display: none; position: fixed; background: white; border: 4px solid #667eea; border-radius: 20px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 1000;">
-                    <div style="font-size: 1.5em; font-weight: bold; color: #667eea; margin-bottom: 15px; text-align: center;">האות היא:</div>
-                    <div style="display: flex; gap: 15px;">
-                        <button onclick="chooseLetterType(false)" style="flex: 1; background: #1971c2; color: white; border: none; padding: 20px; border-radius: 15px; font-size: 1.3em; cursor: pointer; font-weight: bold;">
-                            ⬆️<br>רגילה
+                <div class="options-grid">
+                    ${shuffled.map((item, idx) => `
+                        <button class="option-btn" style="font-size: 4em; padding: 40px;" 
+                                onclick="checkDifference(this, ${item.isDifferent}, '${item.letter}')">
+                            ${item.letter}
                         </button>
-                        <button onclick="chooseLetterType(true)" style="flex: 1; background: #c2255c; color: white; border: none; padding: 20px; border-radius: 15px; font-size: 1.3em; cursor: pointer; font-weight: bold;">
-                            ⬇️<br>סופית
-                        </button>
-                    </div>
+                    `).join('')}
                 </div>
             `;
         }
 
-        let currentSelectedLetter = null;
-
-        function showChoiceBubble(element, event) {
-            // Only show bubble if letter is still in pool
-            const pool = document.getElementById('lettersPool');
-            if (element.parentElement !== pool) {
-                returnLetterToPool(element);
-                return;
-            }
-            
-            event.stopPropagation();
-            currentSelectedLetter = element;
-            
-            const bubble = document.getElementById('choiceBubble');
-            const rect = element.getBoundingClientRect();
-            
-            bubble.style.display = 'block';
-            bubble.style.left = (rect.left + rect.width / 2 - 150) + 'px';
-            bubble.style.top = (rect.top - 180) + 'px';
-        }
-
-        function chooseLetterType(isFinal) {
-            const bubble = document.getElementById('choiceBubble');
-            bubble.style.display = 'none';
-            
-            if (!currentSelectedLetter) return;
-            
-            const regularTarget = document.getElementById('regularTarget');
-            const finalTarget = document.getElementById('finalTarget');
-            const regularPlaceholder = document.getElementById('regularPlaceholder');
-            const finalPlaceholder = document.getElementById('finalPlaceholder');
-            
-            const actuallyFinal = currentSelectedLetter.dataset.isfinal === 'true';
-            
-            if (isFinal === actuallyFinal) {
-                // Correct choice!
-                if (isFinal) {
-                    if (finalPlaceholder) finalPlaceholder.remove();
-                    finalTarget.appendChild(currentSelectedLetter);
-                } else {
-                    if (regularPlaceholder) regularPlaceholder.remove();
-                    regularTarget.appendChild(currentSelectedLetter);
-                }
-                currentSelectedLetter.onclick = function() { returnLetterToPool(this); };
-                currentSelectedLetter = null;
-            } else {
-                // Wrong choice! Shake and play error sound
-                playErrorSound();
-                currentSelectedLetter.style.animation = 'shake 0.5s';
-                setTimeout(() => {
-                    currentSelectedLetter.style.animation = '';
-                }, 500);
-                currentSelectedLetter = null;
-            }
-        }
-
-        function returnLetterToPool(element) {
-            const pool = document.getElementById('lettersPool');
-            const regularTarget = document.getElementById('regularTarget');
-            const finalTarget = document.getElementById('finalTarget');
-            
-            // Return to pool
-            pool.appendChild(element);
-            element.onclick = function(e) { showChoiceBubble(this, e); };
-            
-            // Add placeholders back if targets are empty
-            if (regularTarget.querySelectorAll('.draggable-letter').length === 0 && !document.getElementById('regularPlaceholder')) {
-                regularTarget.innerHTML = '<div style="color: #1971c2; font-weight: bold; font-size: 1.3em;" id="regularPlaceholder">אותיות רגילות</div>';
-            }
-            
-            if (finalTarget.querySelectorAll('.draggable-letter').length === 0 && !document.getElementById('finalPlaceholder')) {
-                finalTarget.innerHTML = '<div style="color: #c2255c; font-weight: bold; font-size: 1.3em;" id="finalPlaceholder">אותיות סופיות</div>';
-            }
-        }
-
-        function checkSorting() {
-            const regularTarget = document.getElementById('regularTarget');
-            const finalTarget = document.getElementById('finalTarget');
-            
-            const regularElements = Array.from(regularTarget.querySelectorAll('.draggable-letter'));
-            const finalElements = Array.from(finalTarget.querySelectorAll('.draggable-letter'));
-            
-            const allCorrect = regularElements.every(el => el.dataset.isfinal === 'false') &&
-                              finalElements.every(el => el.dataset.isfinal === 'true');
-            
-            if (allCorrect && regularElements.length === currentQuestion.regular.length && 
-                finalElements.length === currentQuestion.final.length) {
-                // Success! Show green feedback
-                regularTarget.style.background = '#d3f9d8';
-                regularTarget.style.borderColor = '#51cf66';
-                finalTarget.style.background = '#d3f9d8';
-                finalTarget.style.borderColor = '#51cf66';
-                
-                [...regularElements, ...finalElements].forEach(el => {
-                    el.style.background = '#51cf66';
-                    el.style.color = 'white';
-                    el.style.borderColor = '#51cf66';
-                });
-                
+        function checkDifference(button, isDifferent, letter) {
+            if (isDifferent) {
+                // Correct!
+                button.style.background = '#51cf66';
+                button.style.color = 'white';
                 playSuccessSound();
-                score += 20;
+                recordSuccess(letter);
+                score += 10;
                 document.getElementById('score').textContent = score;
+                
+                setTimeout(() => {
+                    button.style.opacity = '0';
+                    button.style.transform = 'scale(0)';
+                }, 300);
                 
                 setTimeout(() => {
                     nextQuestion();
                 }, 1500);
             } else {
+                // Wrong!
+                button.style.background = '#ff6b6b';
+                button.style.color = 'white';
+                button.disabled = true;
                 playErrorSound();
-                [regularTarget, finalTarget].forEach(target => {
-                    target.style.animation = 'shake 0.5s';
-                    setTimeout(() => {
-                        target.style.animation = '';
-                    }, 500);
-                });
+                recordFailure(currentQuestion.letter);
+                
+                setTimeout(() => {
+                    button.style.background = '';
+                    button.style.color = '';
+                }, 600);
             }
         }
-
-        // Close bubble when clicking outside
-        document.addEventListener('click', (e) => {
-            const bubble = document.getElementById('choiceBubble');
-            if (bubble && !bubble.contains(e.target) && !e.target.classList.contains('draggable-letter')) {
-                bubble.style.display = 'none';
-                currentSelectedLetter = null;
-            }
-        });
 
         // Level 7: Floating Balloons
         function renderLevel7() {
